@@ -1,0 +1,152 @@
+{
+  "task": "Lane 2 severe_decline (trend_pct < -20) classifier, ranked queue",
+  "label_base_rate": 0.5974734163409979,
+  "feature_columns": [
+    "log_impressions_90d",
+    "ctr_filled",
+    "position_filled",
+    "log_search_volume",
+    "age_days",
+    "days_since_update",
+    "staleness_bucket",
+    "vis_bucket",
+    "striking_bonus",
+    "has_word_count",
+    "word_count_filled"
+  ],
+  "split": "GroupShuffleSplit by client_id, N_folds=5, test_size=0.2, random_state=42",
+  "random_state": 42,
+  "per_fold_results": [
+    {
+      "fold": 0,
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200": 0.37,
+      "prec@50": 0.3,
+      "n_test": 3614
+    },
+    {
+      "fold": 0,
+      "method": "Logistic Regression (Scaled)",
+      "prec@200": 0.735,
+      "prec@50": 0.72,
+      "n_test": 3614
+    },
+    {
+      "fold": 0,
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200": 0.675,
+      "prec@50": 0.56,
+      "n_test": 3614
+    },
+    {
+      "fold": 1,
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200": 0.725,
+      "prec@50": 0.64,
+      "n_test": 2086
+    },
+    {
+      "fold": 1,
+      "method": "Logistic Regression (Scaled)",
+      "prec@200": 0.825,
+      "prec@50": 0.7,
+      "n_test": 2086
+    },
+    {
+      "fold": 1,
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200": 0.875,
+      "prec@50": 0.8,
+      "n_test": 2086
+    },
+    {
+      "fold": 2,
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200": 0.37,
+      "prec@50": 0.28,
+      "n_test": 3029
+    },
+    {
+      "fold": 2,
+      "method": "Logistic Regression (Scaled)",
+      "prec@200": 0.64,
+      "prec@50": 0.74,
+      "n_test": 3029
+    },
+    {
+      "fold": 2,
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200": 0.675,
+      "prec@50": 0.72,
+      "n_test": 3029
+    },
+    {
+      "fold": 3,
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200": 0.585,
+      "prec@50": 0.44,
+      "n_test": 1274
+    },
+    {
+      "fold": 3,
+      "method": "Logistic Regression (Scaled)",
+      "prec@200": 0.705,
+      "prec@50": 0.82,
+      "n_test": 1274
+    },
+    {
+      "fold": 3,
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200": 0.78,
+      "prec@50": 0.82,
+      "n_test": 1274
+    },
+    {
+      "fold": 4,
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200": 0.595,
+      "prec@50": 0.58,
+      "n_test": 1484
+    },
+    {
+      "fold": 4,
+      "method": "Logistic Regression (Scaled)",
+      "prec@200": 0.77,
+      "prec@50": 0.78,
+      "n_test": 1484
+    },
+    {
+      "fold": 4,
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200": 0.775,
+      "prec@50": 0.8,
+      "n_test": 1484
+    }
+  ],
+  "comparison_table": [
+    {
+      "method": "Base rate (severe_decline = 59.7%)",
+      "prec@200 (mean\u00b1std)": "59.7%  (random)",
+      "prec@50 (mean\u00b1std)": "59.7%  (random)",
+      "mean_n_test": 2297
+    },
+    {
+      "method": "Baseline (Week-4 Rule)",
+      "prec@200 (mean\u00b1std)": "52.9% \u00b1 15.5%",
+      "prec@50 (mean\u00b1std)": "44.8% \u00b1 16.2%",
+      "mean_n_test": 2297
+    },
+    {
+      "method": "Logistic Regression (Scaled)",
+      "prec@200 (mean\u00b1std)": "73.5% \u00b1 6.9%",
+      "prec@50 (mean\u00b1std)": "75.2% \u00b1 4.8%",
+      "mean_n_test": 2297
+    },
+    {
+      "method": "Random Forest (d=6, 200 trees)",
+      "prec@200 (mean\u00b1std)": "75.6% \u00b1 8.4%",
+      "prec@50 (mean\u00b1std)": "74.0% \u00b1 10.8%",
+      "mean_n_test": 2297
+    }
+  ]
+}
