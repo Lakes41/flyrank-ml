@@ -1,0 +1,50 @@
+{
+  "playbook_rows": 22006,
+  "actions": {
+    "IGNORE": 20006,
+    "OBSERVE": 1500,
+    "REFRESH": 500
+  },
+  "archetypes": {
+    "LOW_CTR_DECAY": 13027,
+    "MIXED_SIGNALS": 8379,
+    "CONTENT_DEPTH_GAP": 306,
+    "STRIKING_DISTANCE": 282,
+    "VERY_STALE_HIGH_VIS": 12
+  },
+  "action_cuts": {
+    "REFRESH_top_K": 500,
+    "OBSERVE_next_K": 1500
+  },
+  "confidence_band_cutoffs_pp": {
+    "high_threshold_pp": 78,
+    "medium_threshold_pp": 62
+  },
+  "population_shift_baseline_pp": {
+    "content_type_distribution_pp": {
+      "keyword article": 96.7,
+      "comparison article": 1.7,
+      "feedly article": 1.6
+    },
+    "impressions_90d_median": 1704.5,
+    "search_volume_nonzero_share_pp": 58.65218576751795
+  },
+  "score_calibration_trigger": {
+    "current_top200_severe_decline_rate_observed_pp": 95.5,
+    "retrain_floor_pp": 60.0
+  },
+  "decay_refresh_observed_association": {
+    "staleness_threshold_days": 180,
+    "stale_rate_pp": 74.3,
+    "fresh_rate_pp": 59.7,
+    "observed_gap_pp": 14.6,
+    "observed_multiplier": 1.24
+  },
+  "not_automated_list": [
+    "auto_delete_or_archive_pages",
+    "auto_publish_updates_to_cms",
+    "auto_rewrite_seo_keywords_or_titles",
+    "billing_or_pricing_decisions",
+    "strategic_pages_without_human_signoff"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "archetype_distribution": {
+    "LOW_CTR_DECAY": 13027,
+    "MIXED_SIGNALS": 8379,
+    "CONTENT_DEPTH_GAP": 306,
+    "STRIKING_DISTANCE": 282,
+    "VERY_STALE_HIGH_VIS": 12
+  },
+  "action_distribution": {
+    "IGNORE": 20006,
+    "OBSERVE": 1500,
+    "REFRESH": 500
+  },
+  "source_notebook": "w07_action_playbook.ipynb"
+}
