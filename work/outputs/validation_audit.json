@@ -1,0 +1,220 @@
+{
+  "label_base_rate": 0.5974734163409979,
+  "regimes": {
+    "random_split": [
+      {
+        "fold_idx": 0,
+        "n_train": 17604,
+        "n_test": 4402,
+        "test_base_rate": 0.5874602453430259,
+        "prec@200": 0.92,
+        "prec@50": 0.94
+      },
+      {
+        "fold_idx": 1,
+        "n_train": 17604,
+        "n_test": 4402,
+        "test_base_rate": 0.6040436165379373,
+        "prec@200": 0.89,
+        "prec@50": 0.92
+      },
+      {
+        "fold_idx": 2,
+        "n_train": 17604,
+        "n_test": 4402,
+        "test_base_rate": 0.5988187187641981,
+        "prec@200": 0.91,
+        "prec@50": 0.9
+      },
+      {
+        "fold_idx": 3,
+        "n_train": 17604,
+        "n_test": 4402,
+        "test_base_rate": 0.6063153112221717,
+        "prec@200": 0.88,
+        "prec@50": 0.92
+      },
+      {
+        "fold_idx": 4,
+        "n_train": 17604,
+        "n_test": 4402,
+        "test_base_rate": 0.6010904134484325,
+        "prec@200": 0.89,
+        "prec@50": 0.9
+      }
+    ],
+    "grouped_split": [
+      {
+        "fold_idx": 0,
+        "n_train": 18392,
+        "n_test": 3614,
+        "test_base_rate": 0.5525733259546209,
+        "prec@200": 0.675,
+        "prec@50": 0.56
+      },
+      {
+        "fold_idx": 1,
+        "n_train": 19920,
+        "n_test": 2086,
+        "test_base_rate": 0.7847555129434324,
+        "prec@200": 0.875,
+        "prec@50": 0.8
+      },
+      {
+        "fold_idx": 2,
+        "n_train": 18977,
+        "n_test": 3029,
+        "test_base_rate": 0.4321558270056124,
+        "prec@200": 0.675,
+        "prec@50": 0.72
+      },
+      {
+        "fold_idx": 3,
+        "n_train": 20732,
+        "n_test": 1274,
+        "test_base_rate": 0.47802197802197804,
+        "prec@200": 0.78,
+        "prec@50": 0.82
+      },
+      {
+        "fold_idx": 4,
+        "n_train": 20522,
+        "n_test": 1484,
+        "test_base_rate": 0.6226415094339622,
+        "prec@200": 0.775,
+        "prec@50": 0.8
+      }
+    ]
+  },
+  "comparison_table": [
+    {
+      "regime": "Base rate severe_decline (59.7%)",
+      "fold_rows": 5,
+      "prec@200 (mean\u00b1std)": "59.7%  (random)",
+      "prec@50 (mean\u00b1std)": "59.7%  (random)",
+      "mean_test_base_rate": "59.7%"
+    },
+    {
+      "regime": "Random ShuffleSplit (BEFORE, naive)",
+      "fold_rows": 5,
+      "prec@200 (mean\u00b1std)": "89.8% \u00b1 1.6%",
+      "prec@50 (mean\u00b1std)": "91.6% \u00b1 1.7%",
+      "mean_test_base_rate": "60.0%"
+    },
+    {
+      "regime": "GroupShuffleSplit by client (AFTER, honest)",
+      "fold_rows": 5,
+      "prec@200 (mean\u00b1std)": "75.6% \u00b1 8.4%",
+      "prec@50 (mean\u00b1std)": "74.0% \u00b1 10.8%",
+      "mean_test_base_rate": "57.4%"
+    }
+  ],
+  "gap_percentage_points": {
+    "prec@200": 14.200000000000001,
+    "prec@50": 17.600000000000005
+  },
+  "leakage_audit": {
+    "taxon_1_label_derived": {
+      "honest_prec200": 0.675,
+      "leaked_prec200": 1.0,
+      "feature_suspect_intersection_empty": true,
+      "harness_confession_jump_percentage_points": 32.49999999999999
+    },
+    "taxon_2_overlapping_windows": {
+      "timeline_drawn": true,
+      "disclosed_limitation": "Starter export only; warehouse must enforce report_date < label_month_start."
+    },
+    "taxon_3_decision_flags": {
+      "flag_intersection_empty": true
+    },
+    "attack_checklist_9_point": [
+      {
+        "item": "1. Timeline drawn: all features strictly before label window",
+        "explanation": "YES (\u00a73b audit: every feature is 90d-trailing snapshot or static metadata)",
+        "passed": true
+      },
+      {
+        "item": "2. No label-derived or sibling columns in features",
+        "explanation": "YES (\u00a73a: train-with trend_pct = 100% vs train-without = 68%. Honest frame \u2229 label cols = empty)",
+        "passed": true
+      },
+      {
+        "item": "3. No product flags / existing-system scores as features",
+        "explanation": "YES (\u00a73c: no flag/action/refresh columns in features \u2014 clean export)",
+        "passed": true
+      },
+      {
+        "item": "4. Population selection checked for outcome-window info",
+        "explanation": "LIMITATION DISCLOSED: starter export is a one-time 90d snapshot. Lane filter (imp_90d \u2265 100) is trailing-90d (OK), but we cannot fully verify 'still-active-in-label-month' clients without warehouse panel. Per skill this is a CHOICE, hidden only if undisclosed \u2014 we disclose it here.",
+        "passed": false
+      },
+      {
+        "item": "5. Split grouped by repeating entity (client_id)",
+        "explanation": "YES (\u00a72: GroupShuffleSplit by client_id; per-fold overlap asserted empty)",
+        "passed": true
+      },
+      {
+        "item": "6. Base rate printed next to every metric",
+        "explanation": "YES (base rate = 59.7%; printed in \u00a72 next to both prec@200 and prec@50)",
+        "passed": true
+      },
+      {
+        "item": "7. Top feature importance sanity-checked (no giant gap)",
+        "explanation": "LIMITATION DISCLOSED: permutation-importance top feature was CTR at 11.5 pp (\u00a74a w05), not a 60 pp 'perfect' gap \u2014 OK, no leakage red flag",
+        "passed": true
+      },
+      {
+        "item": "8. Metrics recomputed out-of-fold (never in-sample)",
+        "explanation": "YES (\u00a72 folds use held-out test only for scoring; no in-sample train score reported)",
+        "passed": true
+      },
+      {
+        "item": "9. Sealed/holdout claims: receipts committed",
+        "explanation": "Receipt file validation_audit.json written to work/outputs/ (\u00a72 comparison table + \u00a73 audit). Committed with this notebook.",
+        "passed": true
+      }
+    ],
+    "unverified_limitation_disclosed": "Checklist #4 not 100% verifiable on starter export; warehouse population must re-check 'active-in-label-month' filter independence."
+  },
+  "claim_rewrites": [
+    {
+      "id": 1,
+      "original_strong": "ORIGINAL (over-stretched \u2014 the kind of line I almost wrote in Week-5):\n  \"Random Forest achieves excellent precision and generalizes well to new clients.\"\n",
+      "rewritten_safe": "REWRITE (measured + decision-support + scoped):\n  \"On this 22,006-row starter-export Lane 2 slice, measured across 5 client-held-out\n   GroupShuffleSplit folds (test_size=0.2, random_state=42), the Random Forest\n   (200 trees, max_depth=6, min_samples_leaf=5) produced a mean prec@200 of\n   75.6%. On the same folds, the frozen Week-4 rule scored 52.9%;\n   the naive random-shuffle baseline (\u00a72 BEFORE) scored 89.8%,\n   a gap of +14.2 pp, indicating the model partially\n   memorizes client-specific patterns on a random split. The model is a decision-support\n   tool for ranking an editor queue. 'Generalizes well to brand-new FlyRank customers' is\n   a claim this starter-export notebook does not have evidence for \u2014 deployment evidence\n   would need a forward-month time-based holdout on the warehouse panel.\"\n"
+    },
+    {
+      "id": 2,
+      "original_strong": "ORIGINAL (over-stretched, causal language):\n  \"CTR is the #1 driver of content decline, and staleness causes SEO slip.\"\n",
+      "rewritten_safe": "REWRITE (directional + measured + non-causal):\n  \"On the last-fold client-held-out prec@200 score, CTR-filled (0 where missing) was\n   the feature with the largest observed permutation-importance drop (11.5 pp \u00b1 2.4 pp\n   drop when shuffled \u2014 w05 \u00a74a). Content age ranked second at 3.9 pp drop; position\n   third at 1.7 pp. In train-fold correlation, CTR was directionally associated with\n   severe_decline (corr \u2248 \u22120.08: lower CTR \u2192 more severe decline was OBSERVED in this\n   export). These are measured, directional associations on the 22,006-row starter\n   snapshot \u2014 not causal claims. A causal claim would need an A/B rollout where CTR\n   is changed and SEO slip measured.\n"
+    },
+    {
+      "id": 3,
+      "original_strong": "ORIGINAL (over-stretched, absolute-quality claim):\n  \"This model is ready for production; it finds more declining pages and is much better than the rule.\"\n",
+      "rewritten_safe": "REWRITE (scoped + population + with honest error caveat):\n  \"Measured across 5 OOF client-held-out folds on the starter export, the RF had a\n   +22.7 pp higher mean prec@200 than the frozen Week-4 rule (75.6% vs 52.9%).\n   The same score on a naive random split was 89.8%, so\n   +14.2 pp of that 'big win' is client-memorization\n   the honest grouped split correctly removes. Out-of-fold error analysis on the pooled\n   5 folds (w05 \u00a74b) shows 244 top-200 false positives (wasted editor slots) and 5,720\n   false negatives (hidden opportunities the model still misses). This model is a\n   decision-support ranking improvement ON THIS EXPORT. 'Ready for production' would\n   need: (1) a sealed forward-month time-based holdout on the warehouse panel,\n   (2) re-verification that the grouped-split gain holds on new months, and\n   (3) the disclosed known limitation addressed: last-30-day shape signals are\n   currently invisible to this 90-day-snapshot feature set.\"\n"
+    },
+    {
+      "vocabulary_legend": [
+        {
+          "Avoid (strong / absolute)": "beats / excels at",
+          "Use instead (measured / directional / decision-support)": "was measured to be X pp higher on Y folds than Z"
+        },
+        {
+          "Avoid (strong / absolute)": "generalizes well to new clients",
+          "Use instead (measured / directional / decision-support)": "shows a +14.2 pp gap between random and grouped (\u00a72)"
+        },
+        {
+          "Avoid (strong / absolute)": "drives / causes",
+          "Use instead (measured / directional / decision-support)": "was directionally associated with (corr = +/\u2212 X) in this export"
+        },
+        {
+          "Avoid (strong / absolute)": "ready for production",
+          "Use instead (measured / directional / decision-support)": "is a decision-support ranking improvement on this export; deployment needs sealed forward holdout"
+        },
+        {
+          "Avoid (strong / absolute)": "finds all / fixes",
+          "Use instead (measured / directional / decision-support)": "observes fewer false positives / false negatives ON THIS OOF DATA"
+        }
+      ]
+    }
+  ]
+}
