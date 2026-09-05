@@ -1,0 +1,16 @@
+# Research outputs not meant for public page serving
+work/
+notebooks/
+outputs/
+scripts/
+data/
+submission/
+node_modules/
+.github/
+.git
+# Credentials
+.env
+.env.local
+.env.*.local
+# IDE
+.trae/
