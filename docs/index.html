@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
 
-<title>Ranking Content Pages for Editor Review — FlyRank ML Internship Research</title>
+<title>Which Content Pages Should Editors Review First? — FlyRank ML Internship Research</title>
 <meta name="author" content="Amir Oyeleke" />
-<meta name="description" content="An applied ML study comparing a frozen hand-written rule against a Random Forest on a 22,006-page editor-review ranked-queue task. GroupShuffleSplit by client yields an honest precision@200 of 75.6% (Random Forest) vs. 52.9% (Week-4 baseline), with explicit leakage audits and an actionable playbook." />
+<meta name="description" content="An applied ML study comparing a frozen hand-written rule against a Random Forest on a 22,006-page editor-review ranked-queue task. Within a 200-page review capacity the model identifies about 151 severe-decline pages compared with about 106 using the existing rule — an improvement of +22.7 percentage points on honest client-held-out splits." />
 
-<meta property="og:title" content="Ranking Content Pages for Editor Review" />
-<meta property="og:description" content="A Random Forest vs. hand-written rule comparison for editor-priority queues, built on the FlyRank ML Internship dataset. Honest precision@200 of 75.6% on client-held-out splits." />
+<meta property="og:title" content="Which Content Pages Should Editors Review First?" />
+<meta property="og:description" content="A Random Forest vs. hand-written rule comparison for editor-priority queues. The model finds about 151 useful severe-decline pages per 200 reviewed versus 106 for the baseline, on client-held-out splits measured across 22,006 pages from the FlyRank ML Internship dataset." />
 <meta property="og:type" content="article" />
 <meta property="article:author" content="Amir Oyeleke" />
 <meta property="article:tag" content="machine learning" />
@@ -60,7 +60,9 @@
   <main id="main">
     <header class="masthead" role="banner">
       <p class="kicker">FlyRank ML Internship Research Project · Capstone</p>
-      <h1 class="title" id="top">Ranking Content Pages for Editor Review: A Hand-Written Baseline and a Random Forest on Client-Held-Out Splits</h1>
+      <h1 class="title" id="top">Which Content Pages Should Editors Review First?
+      <span class="title-sub">Comparing a hand-written prioritisation rule with machine-learning models on client-held-out data</span>
+      </h1>
     </header>
 
     <div class="author-block" aria-label="Author information">
@@ -82,7 +84,43 @@
     <section id="abstract" aria-labelledby="abstract-h">
       <div class="abstract" role="doc-abstract">
         <span class="label">Abstract</span>
-        <p id="abstract-h">Content teams decide each month which pages to refresh—a human-scored, high-variance queue with a heavy-tailed traffic distribution. Using the anonymized FlyRank internship starter export (30,000 content items, 32 clients, 22,006 rows after the Lane 2 contract filter), this study frames a ranked-queue task and compares a frozen hand-written rule (Week-4 baseline) against a Logistic Regression and a Random Forest across 5 client-held-out GroupShuffleSplit folds. The Random Forest (200 trees, max depth 6) produces a measured precision@200 of <strong>75.6% ± 8.4%</strong> on held-out clients, versus the Week-4 rule's <strong>52.9% ± 15.5%</strong> on the same folds—a +22.7 pp gap, and a 14.2 pp gap above a naive Random ShuffleSplit that inflates performance by leaking client-memorized patterns into the test set. A 9-point leakage audit (8/9 passed on the starter export, 1 unverified and explicitly disclosed) confirms no label-derived feature remained. The top-500 REFRESH actions from the resulting playbook form an editor-priority queue with a confidence band (HIGH/MEDIUM/LOW), archetype reason codes, and a manual override list for automation-no-go items. The model is a decision-support tool; the evidence is associative, not causal, and scoped to the starter export only.</p>
+        <p id="abstract-h"><strong>1 — Problem.</strong> Content teams must decide each month which pages to refresh, but with thousands of pages in the queue and a heavy-tailed traffic distribution, human triage alone misses high-value opportunities. <strong>2 — Data.</strong> This study evaluates 22,006 anonymised content pages from the FlyRank ML Internship starter export (32 clients, Lane 2: pages with ≥ 100 90-day impressions and no sentinel-zero positions). <strong>3 — Method.</strong> We compare a frozen hand-written Week-4 prioritisation rule, a Logistic Regression, and a Random Forest across 5 honest GroupShuffleSplit folds in which entire clients are kept out of training. <strong>4 — Result.</strong> The Random Forest (200 trees, max depth 6, balanced subsampling) achieves a precision@200 of <strong>75.6% ± 8.4%</strong> on held-out clients, versus <strong>52.9% ± 15.5%</strong> for the Week-4 rule on the same folds — a <strong>+22.7 percentage-point</strong> gap, measured against a 59.7% severe-decline base rate. A 9-point leakage audit confirms no label-derived feature remained (8/9 passed, one item is explicitly disclosed as unverifiable on the starter export). <strong>5 — Practical implication.</strong> Within a fixed 200-page monthly review capacity the Random Forest identifies approximately 45 additional severe-decline pages per cycle compared with the existing rule, turning more of the editor's time into real priority work. Full methodology, leakage details, limitations and reproducibility references follow in later sections.</p>
+      </div>
+    </section>
+
+    <!-- ================= IN PLAIN ENGLISH ================= -->
+    <section aria-labelledby="plain-h" id="plain-english">
+      <div class="plain">
+        <h2 id="plain-h">In plain English</h2>
+        <p><strong>The editorial problem.</strong> Each month an editor or SEO team must decide which of thousands of pages are worth refreshing. A site might publish or maintain 20,000+ long-form articles; no human team can re-read all of them. The pages that actually <em>need</em> attention are scattered unevenly — a few high-traffic pages carry most of the opportunity, so the <em>order</em> in which pages are reviewed matters more than classifying every page correctly.</p>
+        <p><strong>Why reviewing every page is impractical.</strong> On the evaluated 22,006-page slice, 59.7% of pages show some degree of severe decline on a proxy trend indicator. Even if editors had time to review all 22,006 pages, most changes would be unnecessary or low-upside. Reviewing the <em>top 200</em> ranked by a model concentrates effort on the highest-expected-value candidates, where each hour of editorial time has the most impact.</p>
+        <p><strong>What the existing baseline rule does.</strong> The frozen Week-4 rule scores every page on three integer buckets — <em>staleness</em> (0/1/2 by age since last update), <em>visibility</em> (0/1/2 by 90-day impressions), and a <em>striking distance</em> bonus (1 if the page ranks 11–25 on a keyword with meaningful search volume, else 0). It adds them up (0–5) and sends the highest-scoring pages to the front of the queue. This rule is simple, auditable, and free to run — but it ignores the 8 other signals that can help.</p>
+        <p><strong>What the ML model adds on top of the rule.</strong> The Random Forest re-uses the same three bucket components as raw features (so the rule is a strict subset of what the model <em>could</em> reproduce), then also learns interactions across eight additional signals: click-through rate, average Search Console position, keyword search volume, article age, staleness × CTR co-occurrence, content-depth flag, median-imputed word count, and a log-scale transform on impressions and volume. It learns which combinations of features actually coincide with observed decline on held-out clients.</p>
+        <p><strong>The headline result.</strong> Measured across 5 independent folds where entire clients are hidden from training, the Random Forest finds severe-decline pages in the top-200 at a rate of 75.6%, versus 52.9% for the Week-4 rule. In intuitive numbers: about <strong>151 useful severe-decline pages per 200 reviewed</strong> using the Random Forest, about <strong>106 per 200</strong> using the existing baseline rule — <strong>45 additional useful candidates</strong> within the same monthly review capacity, an improvement of <strong>+22.7 percentage points</strong>.</p>
+        <p><strong>Why it matters.</strong> The improvement is real and honest, not inflated by client-memorization: a naive shuffle that mixes clients between train and test reports 89.8% (14.2 pp higher), which we explicitly reject as too optimistic for production. Publishing 45 more real priorities each month is a tangible time win for an editor team — it moves more of the queue from guesswork to evidence. The model is still a <em>decision-support</em> tool; it ranks pages, it does not (and should not) auto-refresh or auto-delete anything.</p>
+      </div>
+
+      <div class="findings" aria-label="Key findings at a glance">
+        <div class="finding">
+          <div class="n">22,006</div>
+          <div class="u">pages evaluated</div>
+          <span class="l">Lane-2 slice from the FlyRank internship starter export after contract filters (impressions ≥ 100, no sentinel positions, ≥ 90 days old).</span>
+        </div>
+        <div class="finding">
+          <div class="n">75.6%</div>
+          <div class="u">Random Forest precision@200</div>
+          <span class="l">≈ 151 useful severe-decline pages per 200 reviewed on honest client-held-out splits (± 8.4% std).</span>
+        </div>
+        <div class="finding">
+          <div class="n">52.9%</div>
+          <div class="u">Week-4 rule precision@200</div>
+          <span class="l">≈ 106 useful severe-decline pages per 200 reviewed using the existing hand-written baseline (± 15.5% fold std).</span>
+        </div>
+        <div class="finding">
+          <div class="n">+22.7 pp</div>
+          <div class="u">RF over baseline (absolute)</div>
+          <span class="l">≈ 45 additional severe-decline pages found within the same 200-page monthly review capacity on held-out clients.</span>
+        </div>
       </div>
     </section>
 
@@ -153,6 +191,19 @@
     <section id="methodology" aria-labelledby="meth-h">
       <h2 class="section-title" id="meth-h"><span class="num">3</span>Methodology</h2>
 
+      <div class="preamble">
+        <p><strong>Plain-language overview.</strong> This section answers six questions in order:</p>
+        <ol>
+          <li><strong>What the model sees.</strong> Which 11 signals are available at the moment an editor must choose — all trailing snapshots, nothing from the future.</li>
+          <li><strong>What it predicts.</strong> A single binary label: "did this page show severe decline (trend_pct < −20%) on the forward-30-day panel?" The model does <em>not</em> predict traffic numbers themselves; it ranks pages by the probability this label is true.</li>
+          <li><strong>What the baseline does.</strong> The frozen Week-4 hand-written rule scores pages on three integer buckets (staleness, visibility, striking distance) and ranks by the sum.</li>
+          <li><strong>Models compared.</strong> Four systems (base rate, Week-4 rule, Logistic Regression, Random Forest), all evaluated on the same five held-out client folds.</li>
+          <li><strong>How the model was tested fairly.</strong> Entire clients, not individual pages, are held out of training — so the model cannot "memorize" a client's traffic patterns and still claim to generalise.</li>
+          <li><strong>How leakage was prevented.</strong> A three-taxonomy, 9-point check on label-derived features, overlapping windows, and decision-flag features; 8 of 9 items pass; 1 item is explicitly disclosed as unverifiable on the starter export and should be re-checked on the warehouse panel.</li>
+        </ol>
+        <p>Readers who want the formal definitions can continue below; readers who only need the result can skip to §4.</p>
+      </div>
+
       <h3 id="m-assumptions">3.1 Assumptions and task shape</h3>
       <ul>
         <li><strong>Task:</strong> ranking via probabilistic binary classification. We learn a score <code>P(severe_decline = 1 | X)</code>, rank rows by decreasing score, and inspect the top-K for precision.</li>
@@ -214,9 +265,15 @@
 
       <h3 id="m-validation">3.5 Validation design</h3>
 
+      <div class="preamble">
+        <p><strong>Why we keep whole clients out of training.</strong> The most common way a ranked-queue model looks great on paper but fails in practice is client-level memorization: the model learns that Client A's pages always do X and Client B's pages always do Y, instead of learning general signals that transfer to an unseen new client. A normal random shuffle splits individual pages between train and test — it leaves most of a client's pages in training and leaks the client-specific baseline into the test set.</p>
+        <p><strong>What we do instead.</strong> Before any fold is created, we split the 30 clients into groups. Inside a single fold, every page from a given client appears either in training OR in test, never both. This is the conservative, realistic choice for a tool that is meant to be re-used on future FlyRank clients whose traffic baselines we have never seen.</p>
+        <p><strong>The numbers.</strong> When the same Random Forest is evaluated with a naive page-level shuffle (clients mixed in both halves), the measured precision@200 is <strong>89.8%</strong>. With the honest grouped split it is <strong>75.6%</strong>. The −14.2 percentage-point gap is exactly the amount of client-level memorization the grouped split removes. The lower, honest number (75.6%) is reported as the paper's result because it is the better estimate of what an unseen new client would experience. In later sections this split-design difference is shown in a dedicated table and chart.</p>
+      </div>
+
       <div class="callout warn" aria-label="Validation design caution">
-        <h4>Honest split design</h4>
-        <p><strong>GroupShuffleSplit(n_splits=5, test_size=0.2, random_state=42) grouped by <code>client_id</code>.</strong> A client never contributes rows to both train and test inside a fold. This design prevents the classifier from memorizing per-client traffic baselines (a real but cheap signal) and inflating its measured precision.</p>
+        <h4>Honest split design — formal parameters</h4>
+        <p><code>GroupShuffleSplit(n_splits=5, test_size=0.2, random_state=42)</code> grouped by <code>client_id</code>. A client never contributes rows to both train and test inside a single fold.</p>
       </div>
 
       <p><strong>Inflation check (§2 of w06_validation_audit).</strong> The same Random Forest on a naive ShuffleSplit (client-mixed) shows <strong>89.8% ± 1.6% prec@200</strong>; on the grouped split it shows <strong>75.6% ± 8.4% prec@200</strong>, a gap of <strong>−14.2 pp</strong>. The lower grouped number is the honest one reported in this paper.</p>
@@ -231,6 +288,15 @@
       </ol>
 
       <h3 id="m-metrics">3.7 Evaluation metric</h3>
+
+      <div class="preamble">
+        <p><strong>Why precision@200?</strong> An editorial team typically reviews 200 pages in a focused sprint. We therefore score every method <em>only on the top 200 pages it recommends</em>, rather than on the entire 22,006-page queue.</p>
+        <p><strong>Plain language.</strong> If an editor can review only 200 pages, precision@200 measures how many of those recommended pages actually belong to the severe-decline group. A precision@200 of 75.6% means about 151 out of the top 200 are correctly identified severe-decline pages; 52.9% means about 106 out of 200. The gap between the two (≈ 45 pages per 200) is the practical editorial capacity gained by switching from the rule to the model.</p>
+        <p><strong>Formal definition.</strong> Let <em>y&#770;_rank</em> be the model's sorted scores (highest on top) applied to the held-out client test fold. Then:</p>
+        <div class="verbatim">precision@200 = (number of rows among ranks 1..200 with severe_decline=1) ÷ 200</div>
+        <p>Precision@50 is the same definition over the first 50 rows — the "first day of the sprint" queue. Results are reported as the mean across the 5 folds, ± one standard deviation. The base rate of the label (59.7%) is always shown next to every metric so a reader can see how much better a result is than a random ranked queue.</p>
+      </div>
+
       <p>Primary: <strong>precision@200</strong> on the client-held-out test fold. Secondary: <strong>precision@50</strong> (the "first day of the sprint" queue—reviewers want the 50 highest-value actions done first). Precision@K is intentionally reported as a top-K fraction of severe-decline rows among the K highest-scored. Base rate is printed next to every metric; a result of 70% on a 59.7% base rate is a ~10 pp lift, not a 70% hit rate in isolation.</p>
 
       <h3 id="m-leakage">3.8 Leakage prevention and checks</h3>
@@ -249,6 +315,12 @@
     <!-- ================= 4. RESULTS ================= -->
     <section id="results" aria-labelledby="res-h">
       <h2 class="section-title" id="res-h"><span class="num">4</span>Results</h2>
+
+      <div class="preamble">
+        <p><strong>Main result, in one sentence.</strong> Within a 200-page monthly review capacity, the Random Forest identified about <strong>151 severe-decline pages</strong> (precision@200 75.6% ± 8.4%) compared with about <strong>106</strong> using the existing Week-4 hand-written rule (precision@200 52.9% ± 15.5%) — <strong>≈ 45 additional useful candidates</strong> within the same editor capacity, or a <strong>+22.7 percentage-point</strong> absolute improvement on the honest client-held-out split.</p>
+        <p><strong>Why not +45 pp over the 59.7% base rate?</strong> Because the base rate of the label is 59.7% — roughly 120 of 200 pages would be severe-decline by random chance. The rule underperformed random on this metric (106 < 120), the Random Forest beat it by +15.9 pp. This is why the result is reported against both the rule AND the base rate; readers can choose the comparison they trust more.</p>
+        <p>The table and figures below give the complete technical comparison, standard deviations, and the split-inflation discussion.</p>
+      </div>
 
       <h3 id="r-comparison">4.1 The honest comparison table (same folds, same metric, grouped split)</h3>
 
@@ -292,6 +364,12 @@
         </table>
       </div>
 
+      <div class="takeaway"><strong>Takeaway from the table.</strong> Both machine-learned systems beat the Week-4 rule by a wide margin. The Logistic Regression alone (73.5% ± 6.9% prec@200) delivers most of the benefit; moving to a Random Forest adds a further <strong>+2.1 pp</strong>. Because the Week-4 rule's components are preserved as raw features in both models, the models can trivially reproduce the rule — any gain must come from combining the remaining eight signals more effectively.</div>
+
+      <div class="preamble">
+        <p><strong>What Logistic Regression's strong result may suggest (with caveats).</strong> Logistic Regression (73.5% prec@200, ± 6.9% std) performs close to the Random Forest on this task. The gap of +2.1 pp is within one standard deviation of each method, so the extra complexity of a forest might not be justified in a cost-sensitive production environment, where a simpler model is cheaper to monitor, audit and explain. The difference is <em>suggestive, not decisive</em> — a larger sample on the warehouse panel would be needed before confidently choosing one for API deployment. For the playbook CSV export produced here the Random Forest is used for its slightly better headroom and its ability to capture the staleness × CTR interaction that the rule intended, but operators should re-run the comparison on their data.</p>
+      </div>
+
       <p><strong>Interpretation.</strong></p>
       <ul>
         <li>The Random Forest delivers a <strong>+22.7 pp absolute improvement</strong> on precision@200 over the Week-4 hand-written rule (75.6% vs. 52.9%), and a +15.9 pp improvement over label-by-chance (59.7%).</li>
@@ -305,6 +383,7 @@
              width="1200" height="732" loading="lazy" decoding="async" />
         <figcaption id="fig1-cap"><strong>Figure 1.</strong> Frozen Week-4 hand-written rule vs. Logistic Regression vs. Random Forest on 5 client-held-out GroupShuffleSplit folds. Bars show mean precision@K; error bars show ± 1 standard deviation. The Random Forest's precision@200 of 75.6% is 22.7 percentage points above the Week-4 rule (52.9%) and 15.9 pp above chance (59.7%).</figcaption>
       </figure>
+      <div class="takeaway"><strong>What to notice in Figure 1.</strong> The Week-4 rule bar (precision@200) is visibly shorter than the base-rate line, confirming the rule was not tuned for top-200 ranking. The two ML bars are both well above the base-rate line; their standard-deviation whiskers overlap, meaning the measured +2.1 pp gap between LogReg and RF is not statistically decisive on this starter-slice sample size.</div>
 
       <h3 id="r-split">4.2 Why the split design matters: 14.2 pp inflation on a naive split</h3>
 
@@ -327,6 +406,8 @@
         </table>
       </div>
 
+      <div class="takeaway"><strong>Why the lower number is the honest one.</strong> A random shuffle of pages leaves most of a client's pages still in training, so the model can memorize per-client traffic baselines and still look good on held-out <em>pages</em> from that same client. The grouped split forces the model to score pages from completely unseen clients, which matches the real use case of applying this model to new clients or a new month of warehouse data. The 14.2 pp difference is the measurable cost of that leakage.</div>
+
       <p>The 14.2 pp gap (random → grouped) is the <em>exact reason</em> the validation design is grouped. Any future result that reports ≥ 85% on this dataset without a GroupShuffleSplit is, on this starter-slice evidence, inflated. The paper reports 75.6%.</p>
 
       <figure id="fig2" aria-labelledby="fig2-cap">
@@ -335,6 +416,7 @@
              width="1200" height="732" loading="lazy" decoding="async" />
         <figcaption id="fig2-cap"><strong>Figure 2.</strong> Same Random Forest on 5 folds under two split designs. Random ShuffleSplit (left pair) leaks client-memorized patterns into test and reports precision near 90%. GroupShuffleSplit by client_id (right pair) reports 75.6%—a 14.2 pp gap.</figcaption>
       </figure>
+      <div class="takeaway"><strong>What to notice in Figure 2.</strong> The left pair of bars (naive shuffle) sit near 90%, which would look like an excellent model. The right pair (grouped) are more modest. The visual difference between the two pairs is exactly the amount of "inflation" that an incorrectly designed test split gives. Any operator seeing only the naive number would over-invest in a model that does not actually transfer to new clients.</div>
 
       <h3 id="r-staleness">4.3 The staleness signal that the rule leaned on (confirmed, not just assumed)</h3>
 
@@ -346,6 +428,7 @@
              width="1200" height="840" loading="lazy" decoding="async" />
         <figcaption id="fig3-cap"><strong>Figure 3.</strong> Severe-decline rate (bars, left axis) rises monotonically across staleness buckets. Median trend_pct (line with markers, right axis) falls from −30.8% to −44.5%. Staleness ≥ 180d is the editorial triage threshold behind the baseline rule; cell size for the stale bucket is n = 35 on the starter export and grows on the warehouse.</figcaption>
       </figure>
+      <div class="takeaway"><strong>What to notice in Figure 3.</strong> The severe-decline bar rises with each staleness bucket (58.3% → 62.2% → 74.3%), and the trend line falls simultaneously. The monotonic rise in the bar confirms that staleness is a real associative signal even on this starter slice. The rightmost bar is the most useful editorially, but its sample size on the export is small (n = 35) — the figure is directionally informative but not leaned on alone.</div>
 
       <div class="callout warn">
         <h4>Small cell caveat</h4>
@@ -373,6 +456,16 @@
     <!-- ================= 5. PLAYBOOK ================= -->
     <section id="playbook" aria-labelledby="play-h">
       <h2 class="section-title" id="play-h"><span class="num">5</span>The Playbook (ranked recommendations on the 22,006-slice)</h2>
+
+      <div class="preamble">
+        <p><strong>Three action labels, in plain English, before the thresholds.</strong> The model's 22,006 scores are turned into three operational buckets:</p>
+        <ul>
+          <li><strong>REFRESH.</strong> Prioritise for editorial review. Top 500 pages by score — roughly 2.3% of the slice. These pages are the most likely to actually be in severe decline; send them to the top of the sprint backlog.</li>
+          <li><strong>OBSERVE.</strong> Monitor before taking action. Next 1,500 pages — roughly 6.8% of the slice. Keep an eye on them for one cycle, re-score next month; promote to REFRESH only if CTR or position worsens (see the tier-delta check in Recommendation #3).</li>
+          <li><strong>IGNORE FOR NOW.</strong> No immediate review priority. Remaining 20,006 pages — roughly 90.9% of the slice. This is the correct majority behaviour: most content needs nothing done to it in a given month.</li>
+        </ul>
+        <p>The exact count cutoffs (500 REFRESH, next 1,500 OBSERVE, rest IGNORE) are drawn from the operational playbook output and match the table below. Confidence bands, reason codes, archetype labels, and automation-no-go flags are layered on top.</p>
+      </div>
 
       <p>The Random Forest produces <code>P(severe_decline)</code>. The playbook turns this score into an operational ranked queue with:</p>
       <ul>
@@ -405,6 +498,7 @@
              width="1200" height="732" loading="lazy" decoding="async" />
         <figcaption id="fig4-cap"><strong>Figure 4.</strong> 5 archetype buckets (rows) stacked by action label (color). VERY_STALE_HIGH_VIS and STRIKING_DISTANCE contribute the densest REFRESH candidates. 90.9% of the 22,006 slice is IGNORE—good: most content needs no editor action this month.</figcaption>
       </figure>
+      <div class="takeaway"><strong>What to notice in Figure 4.</strong> The archetypes are concentrated: VERY_STALE_HIGH_VIS and STRIKING_DISTANCE together make up almost all the dense REFRESH candidate rows. LOW_CTR_DECAY and MIXED_SIGNALS are overwhelmingly in IGNORE — 90.9% of the slice is left alone, which is the correct outcome for an editorial queue. Readers should not take away "90% of pages are bad" but "90% of pages do not need attention this cycle".</div>
 
       <div class="table-wrap">
         <table>
@@ -447,13 +541,13 @@
         <dl>
           <dt>Action</dt>
           <dd>Work VERY_STALE_HIGH_VIS (n=12, REFRESH top tier) → STRIKING_DISTANCE (n=282) → CONTENT_DEPTH_GAP (n=306) → remaining LOW_CTR_DECAY / MIXED_SIGNALS inside the 500.</dd>
+          <dt>Why</dt>
+          <dd>HIGH if editor capacity ≥ 100–200 / month. On held-out folds the 200-top REFRESH subset showed 75.6% severe-decline rate—that means <strong>151 out of 200</strong> pages in the editor's Monday queue actually <em>are</em> in decline and are not false-priority busywork (≈ 45 more useful pages per 200 than the baseline rule).</dd>
           <dt>Evidence</dt>
           <dd>Very-stale pages show 74.3% severe-decline vs. 58.3% for fresh pages (Figure 3). Striking-distance pages already rank 11–25 on ≥ 100-volume keywords, so a refresh's upside on a real SERPs slot is directionally higher than a deep-rank refresh.</dd>
-          <dt>Expected usefulness</dt>
-          <dd>HIGH if editor capacity ≥ 100–200 / month. On held-out folds the 200-top REFRESH subset showed 75.6% severe-decline rate—that means 4 out of 5 pages in the editor's Monday queue actually <em>are</em> in decline and are not false-priority busywork.</dd>
-          <dt>Caveats</dt>
+          <dt>Caveat</dt>
           <dd>VERY_STALE_HIGH_VIS n = 12 on this slice. The claim is about the archetype, not the 12 specific pages; warehouse scaling increases sample size. The automation-no-go list applies: the queue is ordered, not auto-executed.</dd>
-          <dt>Validation in practice</dt>
+          <dt>How to validate</dt>
           <dd>Compare actual post-refresh impression recovery on the 500 vs. a 500-row control drawn from the IGNORE pool after 1 forward calendar month. Measure difference in medians, not only mean (heavy tails).</dd>
         </dl>
       </article>
@@ -463,13 +557,13 @@
         <dl>
           <dt>Action</dt>
           <dd>For ordering, switch to the RF ranked score. For audit, the staleness/visibility/striking reason codes are printed on every row and match the rule's logic.</dd>
+          <dt>Why</dt>
+          <dd>MEDIUM. The rule is human-readable and serves as a baseline-defense: if RF's score ever <em>regresses</em> below the rule's, a regression flag fires (the playbook includes this in monitoring / retrain triggers).</dd>
           <dt>Evidence</dt>
           <dd>The rule scored 52.9% prec@200 on the same grouped folds that RF scored 75.6%—a +22.7 pp gap. The rule's ±15.5% fold-to-fold std indicates it is sensitive to client composition; RF's std is tighter (±8.4%).</dd>
-          <dt>Expected usefulness</dt>
-          <dd>MEDIUM. The rule is human-readable and serves as a baseline-defense: if RF's score ever <em>regresses</em> below the rule's, a regression flag fires (the playbook includes this in monitoring / retrain triggers).</dd>
-          <dt>Caveats</dt>
+          <dt>Caveat</dt>
           <dd>Don't lose the reason codes—they are what make each top-row defensible.</dd>
-          <dt>Validation in practice</dt>
+          <dt>How to validate</dt>
           <dd>Monthly: recompute the Week-4 rule prec@200 vs. RF prec@200 on a new forward month, using the same grouped split. If RF falls below rule + 3 pp for 2 consecutive months, retrain (current top-200 severe-rate is 95.5%, retrain floor is 60%).</dd>
         </dl>
       </article>
@@ -479,13 +573,13 @@
         <dl>
           <dt>Action</dt>
           <dd>Every OBSERVE row: compute its actual CTR vs. the within-position-tier median. If CTR ≥ tier-median AND position improved over 2 consecutive weekly snapshots, do not promote; the page is <em>holding</em> and the wrong thing would be to spend hours on it. If CTR &lt; tier-median, promote with archetype LOW_CTR_DECAY reason.</dd>
+          <dt>Why</dt>
+          <dd>MEDIUM for a 2-editor team. The 1,500 OBSERVE row set is 3× the REFRESH set; filtering 15–25% of OBSERVE rows correctly saves ~200 wasted refresh briefs per month.</dd>
           <dt>Evidence</dt>
           <dd>CTR×position test in w04: top-3 pages show −23.9 pp severe-rate delta between high-CTR and low-CTR halves; page-1_4_10 shows −14.3 pp. This means CTR <em>within a rank tier</em> is the largest signal not captured by the RF's raw position/CTR interaction.</dd>
-          <dt>Expected usefulness</dt>
-          <dd>MEDIUM for a 2-editor team. The 1,500 OBSERVE row set is 3× the REFRESH set; filtering 15–25% of OBSERVE rows correctly saves ~200 wasted refresh briefs per month.</dd>
-          <dt>Caveats</dt>
+          <dt>Caveat</dt>
           <dd>Weekly snapshots are not in the starter export. On the warehouse, 28 days of daily deltas are required for this rule. Starter-export evidence is directional only.</dd>
-          <dt>Validation in practice</dt>
+          <dt>How to validate</dt>
           <dd>On the warehouse panel, run the OBSERVE promotion check and count how many of the promoted rows actually turn severe over the forward month. Target precision ≥ 70% on the promoted subset.</dd>
         </dl>
       </article>
@@ -495,13 +589,13 @@
         <dl>
           <dt>Action</dt>
           <dd>In <code>word_count</code> / <code>staleness_bucket</code> feature construction, switch from global staleness thresholds to per-content-type thresholds. For news-style content, <code>days_since_update = 26 d</code> is not "fresh" in the same way a comparison article's 26 d is.</dd>
+          <dt>Why</dt>
+          <dd>LOW–MEDIUM (only 1.7% + 1.6% = 3.3% of the slice is not keyword articles). But a 10 pp error reduction on 3.3% of 22k is ~70 rows per release correctly moved, which is decision-useful.</dd>
           <dt>Evidence</dt>
           <dd>The playbook's archetype-contained flag <code>review_block_reason</code> fires on 193 of the 2,000 REFRESH+OBSERVE rows (9.7%) with the message <code>signal_conflict: staleness conflicts with content_type_lifespan</code>.</dd>
-          <dt>Expected usefulness</dt>
-          <dd>LOW–MEDIUM (only 1.7% + 1.6% = 3.3% of the slice is not keyword articles). But a 10 pp error reduction on 3.3% of 22k is ~70 rows per release correctly moved, which is decision-useful.</dd>
-          <dt>Caveats</dt>
+          <dt>Caveat</dt>
           <dd>The content-type column is a 3-way coarse split in the starter; actual CMS types are richer. Warehouse deployment should use the real CMS <code>content_subtype</code>.</dd>
-          <dt>Validation in practice</dt>
+          <dt>How to validate</dt>
           <dd>On the warehouse panel, train two RF variants side-by-side: global-threshold baseline vs. per-content-type staleness thresholds. Measure difference in prec@200 on a new forward-month holdout; ship if ≥ +3 pp for 2 consecutive months.</dd>
         </dl>
       </article>
@@ -511,13 +605,13 @@
         <dl>
           <dt>Action</dt>
           <dd>The current deployment artefact is a ranked CSV queue with human-review flags, NOT an API endpoint. Keep it there until: forward-month time-based holdout on warehouse (month T model, month T+1 label) achieves ≥ 68% prec@200 (the RF lower confidence bound); and leakage checklist item 4 is verified on the real warehouse panel.</dd>
+          <dt>Why</dt>
+          <dd>HIGH. This single recommendation prevents most downstream deploy failures.</dd>
           <dt>Evidence</dt>
           <dd>The validation audit (§3.8, 8/9 items, 1 unverified) and the 14.2 pp split-inflation gap both demonstrate how easy honest-looking numbers can become non-honest once the deployment context differs.</dd>
-          <dt>Expected usefulness</dt>
-          <dd>HIGH. This single recommendation prevents most downstream deploy failures.</dd>
-          <dt>Caveats</dt>
+          <dt>Caveat</dt>
           <dd>None. This is a safety gate, not a feature.</dd>
-          <dt>Validation in practice</dt>
+          <dt>How to validate</dt>
           <dd>Before any API deployment, run a two-month forward holdout: train on months 1…T−1, score month T, compare to actual labels from month T+1. Open the deployment gate only if prec@200 ≥ 68% AND leakage checklist item 4 passes on the warehouse month=2026-03 slice.</dd>
         </dl>
       </article>
@@ -527,7 +621,17 @@
 
     <!-- ================= 7. LIMITATIONS ================= -->
     <section id="limitations" aria-labelledby="lim-h">
-      <h2 class="section-title" id="lim-h"><span class="num">7</span>Limitations &amp; Honest Framing</h2>
+      <h2 class="section-title" id="lim-h"><span class="num">7</span>Limitations &amp; Honest Framing — <em>What this research cannot tell us</em></h2>
+
+      <div class="limitations-intro">
+        <p>A ranking is a decision-support tool, not a guarantee. High measured ranking performance on the starter export is necessary but not sufficient evidence. Specifically, the following are <strong>not proven</strong> by this work and should not be inferred:</p>
+        <ul>
+          <li><strong>Refreshing a page will improve its traffic.</strong> The model predicts historical association with decline. Causal evidence that an editor action (refresh) then reverses traffic loss would need a controlled A/B test on the warehouse panel.</li>
+          <li><strong>Future clients will perform identically.</strong> The 30 clients in the starter slice form a convenience sample. Generalisation to a new client, a new content vertical, or a new calendar month is measured only directionally by the grouped split; full confidence requires re-running on warehouse data.</li>
+          <li><strong>The model explains <em>why</em> a page declined.</strong> Top permutation importance tells us which features <em>co-incide</em> with decline on this slice, but a low-CTR page is not declining <em>because</em> CTR is low — the causal chain in the reverse direction is not tested.</li>
+          <li><strong>Recommendations should automatically trigger actions.</strong> The playbook exports a ranked CSV with human-review flags for editorial use. No deployment step (auto-archive, auto-refresh, auto-rewrite, billing changes) is authorised; the automation-no-go list in §5.2 applies.</li>
+        </ul>
+      </div>
 
       <h3>7.1 Starter-export scope, not warehouse</h3>
       <p>All numbers in this paper come from the 30,000-row anonymized starter export and its 22,006-row Lane 2 slice. The numbers are: representative of <em>association patterns within the starter export</em> on the <em>two-panel</em> snapshot it ships; <strong>not</strong> forward-month predictions on the warehouse panel; <strong>not</strong> validated on a later calendar month (time-based holdout is a separate, required deployment gate); <strong>not</strong> applicable to clients outside the 30 represented.</p>
