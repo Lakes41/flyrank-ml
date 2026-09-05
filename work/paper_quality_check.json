@@ -1,0 +1,137 @@
+{
+  "checklist_version": "task_spec_21_items",
+  "paper_file": "work/research_paper.md",
+  "paper_bytes": 36215,
+  "total_items": 21,
+  "passed_items": 21,
+  "failed_items": 0,
+  "all_passed": true,
+  "checks": [
+    {
+      "id": 1,
+      "name": "Title exists",
+      "passed": true,
+      "notes": "H1 heading at top of paper"
+    },
+    {
+      "id": 2,
+      "name": "Abstract exists directly near the top",
+      "passed": true,
+      "notes": "H2 '## Abstract' section heading found early in doc"
+    },
+    {
+      "id": 3,
+      "name": "Abstract summarises question, method and result",
+      "passed": true,
+      "notes": "Abstract body sentence count = 7; mentions starter 30,000 rows; mentions RF 75.6% result"
+    },
+    {
+      "id": 4,
+      "name": "Introduction / Problem Statement exists",
+      "passed": true,
+      "notes": "Section 1 heading with Introduction/Problem Statement text"
+    },
+    {
+      "id": 5,
+      "name": "Data section exists",
+      "passed": true,
+      "notes": "Section 2 Data heading exists with tables, counts, exclusions, windows"
+    },
+    {
+      "id": 6,
+      "name": "Methodology exists",
+      "passed": true,
+      "notes": "Section 3 Methodology heading with assumptions, features, label, baseline, split, metrics, leakage"
+    },
+    {
+      "id": 7,
+      "name": "Baseline is explicitly defined",
+      "passed": true,
+      "notes": "integer 0..5 score formula written; Week-4 rule described as frozen baseline; action thresholds explicit"
+    },
+    {
+      "id": 8,
+      "name": "Validation design is explained",
+      "passed": true,
+      "notes": "GroupShuffleSplit by client_id; 5 folds; test_size=0.2; random_state=42"
+    },
+    {
+      "id": 9,
+      "name": "Leakage checks are explained",
+      "passed": true,
+      "notes": "9-point leakage checklist; three-taxonomy audit; label-derived harness jump +32.5 pp; 9-checks result"
+    },
+    {
+      "id": 10,
+      "name": "Results compare model and baseline on the same split",
+      "passed": true,
+      "notes": "4-row comparison table (base rate / Week-4 / LogReg / RF) with base rate row visible; same 5 folds annotated for all rows"
+    },
+    {
+      "id": 11,
+      "name": "Relevant charts are included",
+      "passed": true,
+      "notes": "4 embedded Figure image markdown links; figures = model-baseline, split-inflation, staleness-signal, playbook-archetypes"
+    },
+    {
+      "id": 12,
+      "name": "Results are interpreted rather than merely listed",
+      "passed": true,
+      "notes": "1 bold-Interpretation sub-paragraph markers under each main results heading"
+    },
+    {
+      "id": 13,
+      "name": "Limitations are explicit (dedicated section)",
+      "passed": true,
+      "notes": "8 sub-points expected; section headings use 7.1..7.8 sub-numbering"
+    },
+    {
+      "id": 14,
+      "name": "Claims use appropriately cautious language (safe language)",
+      "passed": true,
+      "notes": ""
+    },
+    {
+      "id": 15,
+      "name": "Ranked recommendations are included (Ranked Recs section)",
+      "passed": true,
+      "notes": "5 Recommendation subsections (each with action + evidence + usefulness + caveats + validation-in-practice)"
+    },
+    {
+      "id": 16,
+      "name": "Reproducibility information is included",
+      "passed": true,
+      "notes": "Section 8 heading; references capstone.ipynb; lists supporting notebooks; lists output artifacts"
+    },
+    {
+      "id": 17,
+      "name": "Acknowledgments & Data Credit is included at the bottom",
+      "passed": true,
+      "notes": "Section 9 heading with required phrase 'Built on the FlyRank ML Internship dataset'"
+    },
+    {
+      "id": 18,
+      "name": "https://flyrank.ai is correctly linked",
+      "passed": true,
+      "notes": "Exact markdown link [FlyRank](https://flyrank.ai) present in Acknowledgments"
+    },
+    {
+      "id": 19,
+      "name": "No private information is exposed",
+      "passed": true,
+      "notes": "Tokens/emails/raw IDs not found; paper references the anonymized starter CSV only"
+    },
+    {
+      "id": 20,
+      "name": "Every numerical claim is supported by repository evidence",
+      "passed": true,
+      "notes": "15/15 numerical spot checks (RF/W4/base-rate/split-inflation/leakage-harness/staleness/playbook/actions) match output JSONs"
+    },
+    {
+      "id": 21,
+      "name": "Abstract and Acknowledgments sections present (older templates omits them)",
+      "passed": true,
+      "notes": "Both ## Abstract H2 and ## 9 Acknowledgments H2 headings explicit"
+    }
+  ]
+}

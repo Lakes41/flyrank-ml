@@ -1,0 +1,28 @@
+{
+  "figures": {
+    "fig1_model_vs_baseline": {
+      "title": "Model vs. baseline precision",
+      "source_data": "work/outputs/model_comparison.json",
+      "file": "work/figures/paper_fig1_model_vs_baseline.png",
+      "caption": "Frozen Week-4 hand-written rule vs. Logistic Regression vs. Random Forest on 5 client-held-out GroupShuffleSplit folds. Bars show mean precision@K; error bars show \u00b1 1 std. The Random Forest's precision@200 of 75.6% is 22.7 percentage points above the Week-4 rule (52.9%) and 15.9 pp above chance (59.7%)."
+    },
+    "fig2_split_inflation": {
+      "title": "Random vs. grouped split",
+      "source_data": "work/outputs/validation_audit.json",
+      "file": "work/figures/paper_fig2_split_inflation.png",
+      "caption": "The same Random Forest evaluated under two split designs. Random ShuffleSplit produces inflated prec@200 of 89.8% by leaking client-memorized patterns into test. GroupShuffleSplit by client_id (the honest design) reports 75.6% \u2014 a 14.2 pp gap we explicitly conservatively choose."
+    },
+    "fig3_staleness_signal": {
+      "title": "Staleness vs. severe-decline rate",
+      "source_data": "work/outputs/signal_audit_receipt.json",
+      "file": "work/figures/paper_fig3_staleness_signal.png",
+      "caption": "Staleness buckets confirm the flag assumption behind the Week-4 rule. Severe-decline rate rises monotonically from 58.3% (<90d) to 74.3% (\u2265180d), and median trend_pct drops from \u221230.8% to \u221244.5%."
+    },
+    "fig4_playbook_archetypes": {
+      "title": "Playbook archetype \u00d7 action crosstab",
+      "source_data": "work/outputs/playbook_ranked_actions.csv",
+      "file": "work/figures/paper_fig4_playbook_archetypes.png",
+      "caption": "5 archetype buckets (rows) mapped to REFRESH / OBSERVE / IGNORE actions from the Week-7 ranked playbook. VERY_STALE_HIGH_VIS (n=12) and STRIKING_DISTANCE (n=282) concentrate REFRESH candidates; 90.9% of items are IGNORE."
+    }
+  }
+}

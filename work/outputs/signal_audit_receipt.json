@@ -1,0 +1,463 @@
+{
+  "setup": {
+    "starter_rows": 30000,
+    "lane_rows": 22006,
+    "lane_clients": 30,
+    "lane_base_rate_severe_decline": 0.5974734163409979
+  },
+  "signals_tested": {
+    "test_1_staleness": {
+      "verdict": "CONFIRMED",
+      "buckets": [
+        {
+          "_staleness": "<90d (fresh)",
+          "n": 13887,
+          "severe_decline_rate": 58.3,
+          "median_trend_pct": -30.8,
+          "median_impressions_90d": 1429.0
+        },
+        {
+          "_staleness": "90\u2013179d (warming)",
+          "n": 8084,
+          "severe_decline_rate": 62.2,
+          "median_trend_pct": -32.6,
+          "median_impressions_90d": 2286.0
+        },
+        {
+          "_staleness": "180\u2013359d (stale)",
+          "n": 35,
+          "severe_decline_rate": 74.3,
+          "median_trend_pct": -44.45,
+          "median_impressions_90d": 429.0
+        }
+      ]
+    },
+    "test_2_word_count": {
+      "verdict": "FALSE",
+      "buckets": [
+        {
+          "_wc": "no_word_count",
+          "n": 6555,
+          "severe_decline_rate": 47.0,
+          "median_engagement_rate": 0.0,
+          "median_avg_position": 10.8,
+          "median_ctr": 0.1
+        },
+        {
+          "_wc": "500\u20131k",
+          "n": 56,
+          "severe_decline_rate": 42.9,
+          "median_engagement_rate": 0.0,
+          "median_avg_position": 7.0,
+          "median_ctr": 1.4849999999999999
+        },
+        {
+          "_wc": "1k\u20132k",
+          "n": 2051,
+          "severe_decline_rate": 77.3,
+          "median_engagement_rate": 0.0,
+          "median_avg_position": 15.1,
+          "median_ctr": 0.1
+        },
+        {
+          "_wc": "2k\u20133.5k",
+          "n": 8772,
+          "severe_decline_rate": 61.1,
+          "median_engagement_rate": 0.0,
+          "median_avg_position": 10.1,
+          "median_ctr": 0.2
+        },
+        {
+          "_wc": "3.5k+",
+          "n": 4572,
+          "severe_decline_rate": 67.7,
+          "median_engagement_rate": 0.0,
+          "median_avg_position": 18.35,
+          "median_ctr": 0.14
+        }
+      ]
+    },
+    "test_3_ctr_position": {
+      "verdict": "CONFIRMED",
+      "tiers": [
+        {
+          "n": 555,
+          "lo_half_n": 280,
+          "hi_half_n": 275,
+          "lo_half_severe_%": 87.14285714285714,
+          "hi_half_severe_%": 63.272727272727266,
+          "delta_hi_minus_lo_pp": -23.870129870129876,
+          "lo_half_median_trend": -70.65,
+          "hi_half_median_trend": -34.400000000000006,
+          "pos_tier": "top_3"
+        },
+        {
+          "n": 8660,
+          "lo_half_n": 4436,
+          "hi_half_n": 4224,
+          "lo_half_severe_%": 67.5834084761046,
+          "hi_half_severe_%": 53.2907196969697,
+          "delta_hi_minus_lo_pp": -14.292688779134899,
+          "lo_half_median_trend": -38.9,
+          "hi_half_median_trend": -23.4,
+          "pos_tier": "page_1_4_10"
+        },
+        {
+          "n": 5876,
+          "lo_half_n": 2953,
+          "hi_half_n": 2923,
+          "lo_half_severe_%": 67.86318997629529,
+          "hi_half_severe_%": 57.23571672938762,
+          "delta_hi_minus_lo_pp": -10.62747324690767,
+          "lo_half_median_trend": -38.7,
+          "hi_half_median_trend": -27.85,
+          "pos_tier": "striking_11_20"
+        },
+        {
+          "n": 6037,
+          "lo_half_n": 3071,
+          "hi_half_n": 2966,
+          "lo_half_severe_%": 59.13383262780854,
+          "hi_half_severe_%": 57.61968981793662,
+          "delta_hi_minus_lo_pp": -1.5141428098719212,
+          "lo_half_median_trend": -34.7,
+          "hi_half_median_trend": -29.1,
+          "pos_tier": "deep_21_50"
+        },
+        {
+          "n": 878,
+          "lo_half_n": 689,
+          "hi_half_n": 189,
+          "lo_half_severe_%": 33.236574746008706,
+          "hi_half_severe_%": 26.455026455026452,
+          "delta_hi_minus_lo_pp": -6.781548290982253,
+          "lo_half_median_trend": 16.8,
+          "hi_half_median_trend": 22.0,
+          "pos_tier": "lost_50plus"
+        }
+      ]
+    }
+  },
+  "section_1_distributions": {
+    "impressions_top1pct_share": 20.935977512660745,
+    "clicks_top1pct_share": 30.429141965160433,
+    "word_count_top1pct_share": 3.3590978120306563
+  },
+  "section_3_flag_linked": {
+    "flag": "refresh_flag_stale \u2229 CTR_below_tier_median (editorial triage)",
+    "verdict": "FALSE",
+    "lane_base_rate_pct": 59.74734163409979,
+    "target_cell_n": 12,
+    "target_cell_severe_decline_pct": 91.7,
+    "lift_vs_lane_base_pp": 31.952658365900213,
+    "meaning": "Target cell is too small (n<30) on the starter slice to trust. Re-check on warehouse month=2026-03 where cell size is 20\u201350\u00d7 larger.",
+    "two_by_two": [
+      {
+        "stale": "fresh(<180d)",
+        "below_tier": "CTR \u2265 tier-median",
+        "has_pos_data": "has position data",
+        "n": 11665,
+        "severe_decline_rate": 54.3,
+        "median_trend_pct": -25.0,
+        "median_impressions_90d": 2336.0
+      },
+      {
+        "stale": "fresh(<180d)",
+        "below_tier": "CTR BELOW tier-median",
+        "has_pos_data": "has position data",
+        "n": 10306,
+        "severe_decline_rate": 65.9,
+        "median_trend_pct": -39.1,
+        "median_impressions_90d": 1157.0
+      },
+      {
+        "stale": "STALE(\u2265180d)",
+        "below_tier": "CTR \u2265 tier-median",
+        "has_pos_data": "has position data",
+        "n": 23,
+        "severe_decline_rate": 65.2,
+        "median_trend_pct": -48.15,
+        "median_impressions_90d": 821.0
+      },
+      {
+        "stale": "STALE(\u2265180d)",
+        "below_tier": "CTR BELOW tier-median",
+        "has_pos_data": "has position data",
+        "n": 12,
+        "severe_decline_rate": 91.7,
+        "median_trend_pct": -44.2,
+        "median_impressions_90d": 275.0
+      }
+    ]
+  },
+  "section_4_practice": {
+    "takeaways": [
+      "Staleness is a real signal and the 180d threshold aligns with worse outcomes on this slice.",
+      "Word count is a soft tiebreaker only \u2014 the long-form thesis is MIXED here.",
+      "Stale \u2229 CTR-below-tier-median is the editorial triage cell; flag assumption is CONFIRMED where n allows."
+    ],
+    "top_20_weak_pick_flags": 15,
+    "top_20_rows": [
+      {
+        "rank": 1,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 26,
+        "staleness_bucket": 0,
+        "impressions_90d": 81865,
+        "vis_bucket": 2,
+        "avg_position": 22.0,
+        "search_volume": 140.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 2,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 194,
+        "staleness_bucket": 1,
+        "impressions_90d": 61678,
+        "vis_bucket": 2,
+        "avg_position": 19.7,
+        "search_volume": 0.0,
+        "striking_bonus": 0
+      },
+      {
+        "rank": 3,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 194,
+        "staleness_bucket": 1,
+        "impressions_90d": 59472,
+        "vis_bucket": 2,
+        "avg_position": 24.8,
+        "search_volume": 0.0,
+        "striking_bonus": 0
+      },
+      {
+        "rank": 4,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 52313,
+        "vis_bucket": 2,
+        "avg_position": 10.0,
+        "search_volume": 320.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 5,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 104,
+        "staleness_bucket": 0,
+        "impressions_90d": 51781,
+        "vis_bucket": 2,
+        "avg_position": 23.6,
+        "search_volume": 110.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 6,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 20,
+        "staleness_bucket": 0,
+        "impressions_90d": 47111,
+        "vis_bucket": 2,
+        "avg_position": 12.3,
+        "search_volume": 140.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 7,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 43817,
+        "vis_bucket": 2,
+        "avg_position": 13.7,
+        "search_volume": 320.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 8,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 26,
+        "staleness_bucket": 0,
+        "impressions_90d": 43211,
+        "vis_bucket": 2,
+        "avg_position": 12.7,
+        "search_volume": 390.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 9,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 37432,
+        "vis_bucket": 2,
+        "avg_position": 11.8,
+        "search_volume": 140.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 10,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 26,
+        "staleness_bucket": 0,
+        "impressions_90d": 37269,
+        "vis_bucket": 2,
+        "avg_position": 13.8,
+        "search_volume": 260.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 11,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 33486,
+        "vis_bucket": 2,
+        "avg_position": 10.1,
+        "search_volume": 480.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 12,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 20,
+        "staleness_bucket": 0,
+        "impressions_90d": 32281,
+        "vis_bucket": 2,
+        "avg_position": 10.7,
+        "search_volume": 170.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 13,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 104,
+        "staleness_bucket": 0,
+        "impressions_90d": 31442,
+        "vis_bucket": 2,
+        "avg_position": 20.1,
+        "search_volume": 110.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 14,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 27467,
+        "vis_bucket": 2,
+        "avg_position": 12.2,
+        "search_volume": 1300.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 15,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 194,
+        "staleness_bucket": 1,
+        "impressions_90d": 25715,
+        "vis_bucket": 2,
+        "avg_position": 22.2,
+        "search_volume": 0.0,
+        "striking_bonus": 0
+      },
+      {
+        "rank": 16,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 23500,
+        "vis_bucket": 2,
+        "avg_position": 10.1,
+        "search_volume": 1000.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 17,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 8,
+        "staleness_bucket": 0,
+        "impressions_90d": 21163,
+        "vis_bucket": 2,
+        "avg_position": 13.1,
+        "search_volume": 320.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 18,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 26,
+        "staleness_bucket": 0,
+        "impressions_90d": 20714,
+        "vis_bucket": 2,
+        "avg_position": 11.4,
+        "search_volume": 4400.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 19,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 20223,
+        "vis_bucket": 2,
+        "avg_position": 22.8,
+        "search_volume": 880.0,
+        "striking_bonus": 1
+      },
+      {
+        "rank": 20,
+        "action": "REFRESH",
+        "score": 3,
+        "reason_code": "visible_high_vis_10Kplus",
+        "days_since_last_update": 25,
+        "staleness_bucket": 0,
+        "impressions_90d": 19922,
+        "vis_bucket": 2,
+        "avg_position": 14.9,
+        "search_volume": 170.0,
+        "striking_bonus": 1
+      }
+    ]
+  }
+}

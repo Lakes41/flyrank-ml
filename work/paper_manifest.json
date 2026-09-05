@@ -1,0 +1,73 @@
+{
+  "paper_markdown": "work/research_paper.md",
+  "paper_title": "Ranking Content Pages for Editor Review: A Hand-Written Baseline and a Random Forest on Client-Held-Out Splits",
+  "figures": {
+    "fig1_model_vs_baseline": {
+      "path": "work/figures/paper_fig1_model_vs_baseline.png",
+      "alt": "Model vs. baseline precision at K=200 and K=50",
+      "meta": "work/figures/paper_figures_meta.json"
+    },
+    "fig2_split_inflation": {
+      "path": "work/figures/paper_fig2_split_inflation.png",
+      "alt": "Random vs. grouped split showing 14.2pp inflation",
+      "meta": "work/figures/paper_figures_meta.json"
+    },
+    "fig3_staleness_signal": {
+      "path": "work/figures/paper_fig3_staleness_signal.png",
+      "alt": "Staleness vs severe-decline rate",
+      "meta": "work/figures/paper_figures_meta.json"
+    },
+    "fig4_playbook_archetypes": {
+      "path": "work/figures/paper_fig4_playbook_archetypes.png",
+      "alt": "Playbook archetype by action stacked chart",
+      "meta": "work/figures/paper_figures_meta.json"
+    }
+  },
+  "supporting_tables": {
+    "baseline_action_score_csv": "work/outputs/baseline_action_score.csv",
+    "baseline_metrics_json": "work/outputs/baseline_metrics.json",
+    "signal_audit_receipt_json": "work/outputs/signal_audit_receipt.json",
+    "model_comparison_json": "work/outputs/model_comparison.json",
+    "validation_audit_json": "work/outputs/validation_audit.json",
+    "playbook_ranked_actions_csv": "work/outputs/playbook_ranked_actions.csv",
+    "playbook_summary_json": "work/outputs/playbook_summary.json"
+  },
+  "notebooks_required": [
+    "work/notebooks/capstone.ipynb",
+    "work/notebooks/w03_data_contract.ipynb",
+    "work/notebooks/w04_baseline_score.ipynb",
+    "work/notebooks/w04_signal_audit.ipynb",
+    "work/notebooks/w05_model.ipynb",
+    "work/notebooks/w06_validation_audit.ipynb",
+    "work/notebooks/w07_action_playbook.ipynb"
+  ],
+  "notebooks_reference_only": [
+    "work/notebooks/w01_research_question.ipynb",
+    "work/notebooks/w02_ml_task_framing.ipynb",
+    "work/notebooks/w03_feature_leakage_check.ipynb"
+  ],
+  "public_safety": {
+    "all_client_domains_redacted": true,
+    "no_token_patterns_found": true,
+    "no_raw_content_id_values": true,
+    "no_raw_query_strings": true,
+    "no_internal_infrastructure_details": true
+  },
+  "key_numerical_results": {
+    "base_rate_severe_decline_pct": 59.7,
+    "week4_rule_prec_at_200_pct": 52.9,
+    "logreg_prec_at_200_pct": 73.5,
+    "random_forest_prec_at_200_pct": 75.6,
+    "rf_vs_week4_rule_gain_pp": 22.7,
+    "rf_vs_base_rate_gain_pp": 15.9,
+    "random_split_prec_at_200_pct": 89.8,
+    "grouped_split_prec_at_200_pct": 75.6,
+    "split_inflation_gap_pp": 14.2,
+    "leakage_harness_confession_jump_pp": 32.5,
+    "leakage_attack_checklist_pass_count_9": 8,
+    "playbook_rows": 22006,
+    "playbook_refresh_action_count": 500,
+    "playbook_observe_action_count": 1500,
+    "playbook_ignore_action_count": 20006
+  }
+}

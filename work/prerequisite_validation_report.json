@@ -1,0 +1,184 @@
+{
+  "run_at_utc": "2026-09-05T13:42:50.778285+00:00",
+  "scope": "Deployment-prompt prerequisites \u00a71 \u2013 \u00a719 (Vercel \u00a720 EXCLUDED per user instruction)",
+  "steps": {
+    "S01": {
+      "name": "\u00a71 Repository instructions loaded",
+      "status": "PASS",
+      "evidence": [
+        "Read skills/README.md and router table",
+        "Loaded deploying-static-pages SKILL",
+        "Inspected work/research_paper.md, paper_manifest.json, 4 PNGs, output JSONs"
+      ],
+      "notes": []
+    },
+    "S02": {
+      "name": "\u00a72 Author information (authorised only)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 12/12 passed"
+      ],
+      "notes": []
+    },
+    "S03": {
+      "name": "\u00a73 Public research page (minimal static HTML/CSS/JS)",
+      "status": "PASS",
+      "evidence": [
+        "index.html 54966 B",
+        "styles.css 11785 B",
+        "app.js 2231 B",
+        "No package.json, no framework detected"
+      ],
+      "notes": []
+    },
+    "S04": {
+      "name": "\u00a74 Visual direction (restrained, readable)",
+      "status": "PASS",
+      "evidence": [
+        "Zero gradient/glassmorphism tokens in CSS",
+        "Has serif + sans font stacks",
+        "Has prefers-color-scheme dark mode",
+        "Max column width readable measure"
+      ],
+      "notes": []
+    },
+    "S05": {
+      "name": "\u00a75 Page header hierarchy (Title \u2192 Author \u2192 Abstract)",
+      "status": "PASS",
+      "evidence": [
+        "H1@2891 < author-block@3065 < abstract@4051"
+      ],
+      "notes": []
+    },
+    "S06": {
+      "name": "\u00a76 All required paper sections & figures present",
+      "status": "PASS",
+      "evidence": [
+        "Anchors 10/10 required ids",
+        "4 figure refs + baseline + RF model all found"
+      ],
+      "notes": []
+    },
+    "S07": {
+      "name": "\u00a77 Navigation (sidebar + mobile drawer + TOC anchors)",
+      "status": "PASS",
+      "evidence": [
+        "Navigation structural checks 13/13"
+      ],
+      "notes": []
+    },
+    "S08": {
+      "name": "\u00a78 Research integrity (metrics match research_paper.md)",
+      "status": "PASS",
+      "evidence": [
+        "Key numbers present in BOTH paper & HTML: 15/15",
+        "Recommendation 1 \u2192 5 order preserved"
+      ],
+      "notes": []
+    },
+    "S09": {
+      "name": "\u00a79 Results presentation (tables + fairness + interpretation)",
+      "status": "PASS",
+      "evidence": [
+        "Structural checks 9/9",
+        "4-row fair comparison table present",
+        "Two split-regime table present",
+        "Same-folds fairness statement present"
+      ],
+      "notes": []
+    },
+    "S10": {
+      "name": "\u00a710 Figures (alt text, responsive, captions, real PNG bytes)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 17/17",
+        "Each of 4 PNGs exists >40KB and has alt length >150 chars and figcaption id"
+      ],
+      "notes": []
+    },
+    "S11": {
+      "name": "\u00a711 Ranked recommendations (5 cards, 5 meta fields each, ranks 1-5)",
+      "status": "PASS",
+      "evidence": [
+        "5 rec articles, checks 11/11"
+      ],
+      "notes": []
+    },
+    "S12": {
+      "name": "\u00a712 Reproducibility (repo CTA, notebook references, artefact links)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 13/13"
+      ],
+      "notes": []
+    },
+    "S13": {
+      "name": "\u00a713 Author links & security rel attributes (noreferrer)",
+      "status": "PASS",
+      "evidence": [
+        "4/4 authorised links, 25/25 externals carry noreferrer"
+      ],
+      "notes": []
+    },
+    "S14": {
+      "name": "\u00a714 Mandatory FlyRank acknowledgment & link at bottom",
+      "status": "PASS",
+      "evidence": [
+        "Checks 5/5"
+      ],
+      "notes": []
+    },
+    "S15": {
+      "name": "\u00a715 Responsive design (viewport + breakpoints + table overflowX)",
+      "status": "PASS",
+      "evidence": [
+        "CSS responsive checks 5/5"
+      ],
+      "notes": []
+    },
+    "S16": {
+      "name": "\u00a716 Accessibility (skiplink, 1x H1, semantics, figcaptions, focus)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 7/7"
+      ],
+      "notes": []
+    },
+    "S17": {
+      "name": "\u00a717 Metadata + Open Graph tags (no email exposed in meta)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 7/7"
+      ],
+      "notes": []
+    },
+    "S18": {
+      "name": "\u00a718 Public-safety pass (0 tokens, 0 PII, only 4 site files in docs/)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 9/9",
+        "docs/ contents: ['app.js', 'figures', 'index.html', 'styles.css']"
+      ],
+      "notes": []
+    },
+    "S19": {
+      "name": "\u00a719 Local verification (server + DOM checks, \u00a720 EXCLUDED)",
+      "status": "PASS",
+      "evidence": [
+        "Checks 9/9",
+        "Prior live-local browser-evaluate run matched all 10 section IDs, 4 author links, flyrank ack"
+      ],
+      "notes": []
+    }
+  },
+  "summary": {
+    "total_steps": 19,
+    "passed": 19,
+    "warn": 0,
+    "failed": 0,
+    "all_passed": true,
+    "S20_vercel_step": "EXCLUDED BY USER INSTRUCTION \u2014 documented in audit_trail.md",
+    "S21_update_submission_paper_url_txt": "NOT ATTEMPTED \u2014 requires \u00a720 live URL; user excluded deployment",
+    "S22_live_final_verification_subset": "See \u00a722-style local validation report"
+  }
+}

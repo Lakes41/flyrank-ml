@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+
+<title>Ranking Content Pages for Editor Review — FlyRank ML Internship Research</title>
+<meta name="author" content="Amir Oyeleke" />
+<meta name="description" content="An applied ML study comparing a frozen hand-written rule against a Random Forest on a 22,006-page editor-review ranked-queue task. GroupShuffleSplit by client yields an honest precision@200 of 75.6% (Random Forest) vs. 52.9% (Week-4 baseline), with explicit leakage audits and an actionable playbook." />
+
+<meta property="og:title" content="Ranking Content Pages for Editor Review" />
+<meta property="og:description" content="A Random Forest vs. hand-written rule comparison for editor-priority queues, built on the FlyRank ML Internship dataset. Honest precision@200 of 75.6% on client-held-out splits." />
+<meta property="og:type" content="article" />
+<meta property="article:author" content="Amir Oyeleke" />
+<meta property="article:tag" content="machine learning" />
+<meta property="article:tag" content="search" />
+<meta property="article:tag" content="ranking" />
+
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+
+<button id="nav-toggle" class="nav-toggle" type="button" aria-controls="sitenav" aria-expanded="false">
+  Contents
+</button>
+
+<div class="page">
+  <nav id="sitenav" class="sitenav" aria-label="Section navigation">
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#introduction">1. Introduction</a></li>
+      <li><a href="#data">2. Data</a></li>
+      <li><a href="#methodology">3. Methodology</a>
+        <ul class="sub">
+          <li><a href="#m-label">3.2 Label</a></li>
+          <li><a href="#m-features">3.3 Features</a></li>
+          <li><a href="#m-baseline">3.4 Baseline</a></li>
+          <li><a href="#m-validation">3.5 Validation</a></li>
+          <li><a href="#m-leakage">3.8 Leakage</a></li>
+        </ul>
+      </li>
+      <li><a href="#results">4. Results</a>
+        <ul class="sub">
+          <li><a href="#r-comparison">4.1 Comparison</a></li>
+          <li><a href="#r-split">4.2 Split design</a></li>
+          <li><a href="#r-staleness">4.3 Staleness</a></li>
+        </ul>
+      </li>
+      <li><a href="#playbook">5. Playbook</a></li>
+      <li><a href="#recommendations">6. Recommendations</a></li>
+      <li><a href="#limitations">7. Limitations</a></li>
+      <li><a href="#reproducibility">8. Reproducibility</a></li>
+      <li><a href="#acknowledgments">9. Acknowledgments</a></li>
+    </ul>
+  </nav>
+
+  <main id="main">
+    <header class="masthead" role="banner">
+      <p class="kicker">FlyRank ML Internship Research Project · Capstone</p>
+      <h1 class="title" id="top">Ranking Content Pages for Editor Review: A Hand-Written Baseline and a Random Forest on Client-Held-Out Splits</h1>
+    </header>
+
+    <div class="author-block" aria-label="Author information">
+      <div class="name">Amir Oyeleke</div>
+      <div class="role">Machine Learning Engineer</div>
+      <div class="project">FlyRank ML Internship Research Project</div>
+      <div class="author-links" aria-label="Author links">
+        <a href="https://github.com/lakes41/" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href="https://www.linkedin.com/in/amir-oyeleke-5b3168296" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href="mailto:Oyelekeamir123@gmail.com">Email</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer">Repository</a>
+      </div>
+    </div>
+
+    <!-- ================= ABSTRACT ================= -->
+    <section id="abstract" aria-labelledby="abstract-h">
+      <div class="abstract" role="doc-abstract">
+        <span class="label">Abstract</span>
+        <p id="abstract-h">Content teams decide each month which pages to refresh—a human-scored, high-variance queue with a heavy-tailed traffic distribution. Using the anonymized FlyRank internship starter export (30,000 content items, 32 clients, 22,006 rows after the Lane 2 contract filter), this study frames a ranked-queue task and compares a frozen hand-written rule (Week-4 baseline) against a Logistic Regression and a Random Forest across 5 client-held-out GroupShuffleSplit folds. The Random Forest (200 trees, max depth 6) produces a measured precision@200 of <strong>75.6% ± 8.4%</strong> on held-out clients, versus the Week-4 rule's <strong>52.9% ± 15.5%</strong> on the same folds—a +22.7 pp gap, and a 14.2 pp gap above a naive Random ShuffleSplit that inflates performance by leaking client-memorized patterns into the test set. A 9-point leakage audit (8/9 passed on the starter export, 1 unverified and explicitly disclosed) confirms no label-derived feature remained. The top-500 REFRESH actions from the resulting playbook form an editor-priority queue with a confidence band (HIGH/MEDIUM/LOW), archetype reason codes, and a manual override list for automation-no-go items. The model is a decision-support tool; the evidence is associative, not causal, and scoped to the starter export only.</p>
+      </div>
+    </section>
+
+    <!-- ================= 1. INTRODUCTION ================= -->
+    <section id="introduction" aria-labelledby="intro-h">
+      <h2 class="section-title" id="intro-h"><span class="num">1</span>Introduction / Problem Statement</h2>
+
+      <p>FlyRank content teams publish long-form keyword articles at scale. Search traffic follows a heavy-tailed distribution: on the evaluated slice the top 1% of pages by impressions account for <strong>20.9%</strong> of the total 90-day impressions, and the top 1% by clicks for <strong>30.4%</strong> of clicks. A few wrong decisions concentrate a lot of missed opportunity, so the order in which pages land on the review queue matters more than a global classification.</p>
+
+      <p><strong>Research question.</strong> Given a page's trailing 90-day Search Console signals, article metadata, search-volume estimates, and last-update age—<em>in which order should an editor review pages</em>, and which pages should a reviewer simply ignore?</p>
+
+      <p>The output is not a "decline predictor" in the business sense. It is a ranked queue with three action labels (REFRESH / OBSERVE / IGNORE), per-row reason codes, confidence bands, and explicit no-automation flags. Associations between features and a severe-decline outcome are used to produce that ranking. No claim of causality is made; no claim about forward-month performance on the warehouse panel is made from this starter export.</p>
+
+      <p><strong>Scope.</strong> Lane 2 only: pages with ≥ 100 impressions over 90 days, excluding sentinel-zero-position rows that have fewer than 500 impressions, and excluding pages younger than 90 days from content publication. The label is an observed <em>post hoc</em> severe-decline indicator (<code>trend_pct &lt; −20%</code>) computed on the starter export's two-panel snapshot. This framing matches the w03 data contract and deliberately avoids any future-looking information in the feature set.</p>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 2. DATA ================= -->
+    <section id="data" aria-labelledby="data-h">
+      <h2 class="section-title" id="data-h"><span class="num">2</span>Data</h2>
+
+      <h3 id="d-release">2.1 Dataset and release</h3>
+      <p>Built on the <a href="https://flyrank.ai" target="_blank" rel="noopener noreferrer">FlyRank</a> ML Internship dataset, a gated Hugging Face warehouse release with an anonymized starter CSV fallback. Because <code>HF_TOKEN</code> is intentionally excluded in this run, the analysis in this paper uses the starter export exclusively. The starter export contains one row per anonymized <code>content_id</code> and is engineered so that every feature column is a trailing 90-day snapshot, every label column is a forward-30-day trend measure, and no client name, URL, or raw query is present.</p>
+
+      <h3 id="d-grain">2.2 Observation level and slice counts</h3>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Observation level, slice counts, and data coverage of the evaluated Lane-2 population.</caption>
+          <thead>
+            <tr><th>Property</th><th>Value</th><th>Source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>One row =</td><td>One content item (page, unique content_id)</td><td>Grain probe, 0 duplicates of content_id</td></tr>
+            <tr><td>Starter rows raw</td><td class="num">30,000 × 44 cols, 32 clients</td><td>Starter export metadata</td></tr>
+            <tr><td>Lane-2 slice rows (after filter)</td><td class="num">22,006 (73.3% of starter)</td><td>Contract filter (w03 §2)</td></tr>
+            <tr><td>Unique clients in slice</td><td class="num">30</td><td>Lane-2 slice</td></tr>
+            <tr><td>Content-type shares</td><td>keyword article 96.7%, comparison article 1.7%, feedly article 1.6%</td><td>Playbook population baseline</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">Slice eligibility (w03 contract filter): <strong>(1)</strong> impressions_90d ≥ 100 — pages too small to measure are excluded. <strong>(2)</strong> NOT (avg_position = 0 AND impressions_90d &lt; 500) — sentinel-zero-position rows that are also tiny are excluded (sentinel 0 means "no reliable rank data", not "rank #1"). <strong>(3)</strong> content_age_days ≥ 90 (0 rows younger than 90d remain in the 22,006 slice).</p>
+
+      <h3 id="d-windows">2.3 Feature and label windows</h3>
+      <p>All features are trailing-90-day aggregates or publish-time metadata (time-invariant relative to the decision moment). The label—<code>severe_decline</code> = <code>trend_pct &lt; −20%</code>—is a proxy for the <em>forward</em> decline. The starter export ships pre-split into trailing-snapshot and forward-trend columns. On the warehouse panel the enforcement would be <code>report_date &lt; label_month_start</code>; that enforcement is out of scope for this starter export, and this limitation is disclosed explicitly in §7.</p>
+
+      <p><strong>Label base rate on the slice:</strong> 59.7% of the 22,006 rows have <code>severe_decline = 1</code>. A random ranked queue that took the top-200 would therefore be expected to hit about 59.7% severe-decline rows by chance. The metric (precision@K) is interpreted relative to that baseline.</p>
+
+      <h3 id="d-excluded">2.4 Excluded fields and why</h3>
+      <p>The following eight field families are <em>explicitly excluded from the model feature set</em>:</p>
+      <ol>
+        <li><code>trend_pct</code> and <code>trend_direction</code> — forward outcomes (label source).</li>
+        <li>Any column with <code>decline</code> in the name — label siblings.</li>
+        <li>Any 30-vs-prev-30 ratio column — overlap with the label construction.</li>
+        <li>Existing editorial flags (if shipped in the release) — decision flags from outside the training panel.</li>
+        <li>Client-domain / URL / raw query / PII — not in the starter export, would be excluded even if present.</li>
+        <li>Any row count or revenue figure computed inside the label month — would violate the timeline.</li>
+        <li><code>has_position=1</code> indicators tied to label-month impressions — unverifiable on starter export.</li>
+        <li>Any column derived from the same last-30-days totals used in <code>trend_pct</code>.</li>
+      </ol>
+      <p>This exclusion set is checked in two places: the w03 leakage trap harness (column-set intersection, measured prec@200 jumps from 78.4% to 100% when label-derived columns are added), and the w06 9-point leakage-taxonomy attack.</p>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 3. METHODOLOGY ================= -->
+    <section id="methodology" aria-labelledby="meth-h">
+      <h2 class="section-title" id="meth-h"><span class="num">3</span>Methodology</h2>
+
+      <h3 id="m-assumptions">3.1 Assumptions and task shape</h3>
+      <ul>
+        <li><strong>Task:</strong> ranking via probabilistic binary classification. We learn a score <code>P(severe_decline = 1 | X)</code>, rank rows by decreasing score, and inspect the top-K for precision.</li>
+        <li>Ranking as a surrogate for action priority: a page that <em>ranked higher</em> on the held-out test fold is a page the editor should review <em>earlier</em> that month.</li>
+        <li>Causal silence: no assumption that a refresh <em>will</em> recover the trend; no assumption that a severe-decline label <em>caused</em> the model's feature distribution. The model is an associative priority ranker used as decision support.</li>
+        <li>Heavy-tailed traffic is handled by ranking (not a balanced-accuracy target) and by <code>log(1 + x)</code> preprocessing on impressions and search volume.</li>
+      </ul>
+
+      <h3 id="m-label">3.2 Target / label definition</h3>
+      <p><code>severe_decline</code> (binary, 1 = YES) is defined as <code>trend_pct &lt; −20%</code> on the starter export forward panel. This is the same label used throughout w03 through w07. The threshold is a <em>hand-written safe floor</em> used in the session—not tuned on the validation split. Base rate on the 22,006-slice: <strong>59.7%</strong>.</p>
+
+      <h3 id="m-features">3.3 Feature construction (11 honest columns)</h3>
+      <p>Every feature below is known-before (trailing snapshot or static article metadata).</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Feature construction table. All 11 features are knowable-before the label window.</caption>
+          <thead>
+            <tr><th>#</th><th>Feature</th><th>Kind</th><th>"Knowable when" and notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><code>log_impressions_90d</code></td><td>Numeric</td><td>log(1 + impressions_90d) over trailing 90 days</td></tr>
+            <tr><td>2</td><td><code>ctr_filled</code></td><td>Numeric</td><td>CTR over trailing 90d; zeros filled via within-tier median</td></tr>
+            <tr><td>3</td><td><code>position_filled</code></td><td>Numeric</td><td>Average GSC position; sentinel 0 → imputed using 50 (neutral "lost-50+" value)</td></tr>
+            <tr><td>4</td><td><code>log_search_volume</code></td><td>Numeric</td><td>log(1 + keyword_volume_estimate), 0-filled where missing</td></tr>
+            <tr><td>5</td><td><code>age_days</code></td><td>Numeric</td><td>Content age in days (static since publication)</td></tr>
+            <tr><td>6</td><td><code>days_since_update</code></td><td>Numeric</td><td>Days since last content update; source of the staleness signal</td></tr>
+            <tr><td>7</td><td><code>staleness_bucket</code></td><td>Ordinal [0..2]</td><td>&lt;90d = 0; 90–179d = 1; ≥180d = 2</td></tr>
+            <tr><td>8</td><td><code>vis_bucket</code></td><td>Ordinal [0..2]</td><td>Visibility buckets: &lt;2k = 0; 2k–10k = 1; ≥10k = 2</td></tr>
+            <tr><td>9</td><td><code>striking_bonus</code></td><td>Binary</td><td>1 iff 11 ≤ avg_position ≤ 25 AND search_volume ≥ 100</td></tr>
+            <tr><td>10</td><td><code>has_word_count</code></td><td>Binary</td><td>Availability flag; 0 means NULL not 0 words</td></tr>
+            <tr><td>11</td><td><code>word_count_filled</code></td><td>Numeric</td><td>word_count if known, else within-content-type median</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The three bucket columns (7–9) are the components of the Week-4 baseline rule. Including them as raw features in the classifier lets the Week-4 rule nest <em>inside</em> every tree/split—guaranteeing the baseline is fair: the Random Forest can trivially reproduce the rule, and any gain above it must come from non-linear interaction or the additional 8 features.</p>
+
+      <h3 id="m-baseline">3.4 Baseline definition (Week-4 rule, frozen)</h3>
+
+      <p><strong>Rule in plain words.</strong> A page scores high when it is (a) stale and (b) high-visibility (≥10k impressions 90d), OR (c) at striking distance on a meaningful-volume keyword.</p>
+      <p><strong>Score = staleness_bucket(0–2) + vis_bucket(0–2) + striking_bonus(0/1)</strong> → integer in {0..5}.</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Frozen Week-4 rule: action thresholds and distribution on the 22,006-slice.</caption>
+          <thead>
+            <tr><th>Action</th><th>Threshold</th><th class="num">Count</th><th class="num">Share of 22,006</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>REFRESH</td><td>score ≥ 3</td><td class="num">56 rows</td><td class="num">0.3%</td></tr>
+            <tr><td>OBSERVE</td><td>score = 2</td><td class="num">4,009 rows</td><td class="num">18.2%</td></tr>
+            <tr><td>IGNORE</td><td>score ≤ 1</td><td class="num">17,941 rows</td><td class="num">81.5%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Leakage check on the rule (w04): the 4 raw inputs <code>{days_since_last_update, impressions_90d, avg_position, search_volume}</code> have zero intersection with the 8 known label-proxy columns → status <strong>CLEAN</strong>.</p>
+
+      <h3 id="m-validation">3.5 Validation design</h3>
+
+      <div class="callout warn" aria-label="Validation design caution">
+        <h4>Honest split design</h4>
+        <p><strong>GroupShuffleSplit(n_splits=5, test_size=0.2, random_state=42) grouped by <code>client_id</code>.</strong> A client never contributes rows to both train and test inside a fold. This design prevents the classifier from memorizing per-client traffic baselines (a real but cheap signal) and inflating its measured precision.</p>
+      </div>
+
+      <p><strong>Inflation check (§2 of w06_validation_audit).</strong> The same Random Forest on a naive ShuffleSplit (client-mixed) shows <strong>89.8% ± 1.6% prec@200</strong>; on the grouped split it shows <strong>75.6% ± 8.4% prec@200</strong>, a gap of <strong>−14.2 pp</strong>. The lower grouped number is the honest one reported in this paper.</p>
+
+      <h3 id="m-models">3.6 Models evaluated</h3>
+      <p>Four systems, evaluated on the <em>same five folds</em> so the comparison is fair:</p>
+      <ol>
+        <li><strong>Base rate (59.7%).</strong> Labeling every row as severe_decline=1, then ranking arbitrarily. Precision@K ≈ 59.7%.</li>
+        <li><strong>Week-4 baseline rule</strong> (score 0..5, see §3.4).</li>
+        <li><strong>Logistic Regression with StandardScaler in a Pipeline.</strong> <code>LogisticRegression(max_iter=5000)</code>.</li>
+        <li><strong>Random Forest classifier</strong> (200 trees, <code>max_depth=6</code>, <code>min_samples_leaf=5</code>, <code>class_weight='balanced_subsample'</code>, <code>random_state=42</code>). The Week-4 baseline nests inside this model via the bucket features, so any score below the rule would be a modeling bug (none observed).</li>
+      </ol>
+
+      <h3 id="m-metrics">3.7 Evaluation metric</h3>
+      <p>Primary: <strong>precision@200</strong> on the client-held-out test fold. Secondary: <strong>precision@50</strong> (the "first day of the sprint" queue—reviewers want the 50 highest-value actions done first). Precision@K is intentionally reported as a top-K fraction of severe-decline rows among the K highest-scored. Base rate is printed next to every metric; a result of 70% on a 59.7% base rate is a ~10 pp lift, not a 70% hit rate in isolation.</p>
+
+      <h3 id="m-leakage">3.8 Leakage prevention and checks</h3>
+      <p>A three-taxonomy, 9-point audit:</p>
+
+      <ul>
+        <li><strong>Taxon 1 — label-derived feature harness.</strong> The honest Random Forest produces prec@200 = 67.5% on one fold; adding the direct label-proxy <code>trend_pct_forward</code> as a feature inflates it to 100.0% (jump of +32.5 pp). Because the honest run's features have zero intersection with suspect columns, the harness is satisfied.</li>
+        <li><strong>Taxon 2 — overlapping windows.</strong> Timeline drawn and disclosed. On the starter export the split definition is the CSV's pre-separated trailing vs. forward panels; on the warehouse the enforcement would be strict <code>report_date &lt; label_month_start</code>.</li>
+        <li><strong>Taxon 3 — decision-flag features.</strong> No editorial flag or product score is a model input.</li>
+        <li><strong>9-point checklist result:</strong> 8 / 9 passed. Item 4 ("population selection used outcome-window info?") is <em>not 100% verifiable on starter export</em>, because the starter CSV does not expose individual <code>report_date</code>s. The paper and the playbook both carry a forward-deployment notice: the warehouse month=2026-03 run must re-verify.</li>
+      </ul>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 4. RESULTS ================= -->
+    <section id="results" aria-labelledby="res-h">
+      <h2 class="section-title" id="res-h"><span class="num">4</span>Results</h2>
+
+      <h3 id="r-comparison">4.1 The honest comparison table (same folds, same metric, grouped split)</h3>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Fair model-vs-baseline comparison on 5 client-held-out GroupShuffleSplit folds, same 11 features. Primary metric: precision@200.</caption>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th class="num">precision@200 (mean ± std)</th>
+              <th class="num">precision@50 (mean ± std)</th>
+              <th class="num">Mean test-set size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base rate (label by chance)</td>
+              <td class="num">59.7%</td>
+              <td class="num">59.7%</td>
+              <td class="num">2,297 rows</td>
+            </tr>
+            <tr>
+              <td>Week-4 frozen rule (hand-written baseline)</td>
+              <td class="num">52.9% ± 15.5%</td>
+              <td class="num">44.8% ± 16.2%</td>
+              <td class="num">2,297 rows</td>
+            </tr>
+            <tr>
+              <td>Logistic Regression (scaled)</td>
+              <td class="num">73.5% ± 6.9%</td>
+              <td class="num">75.2% ± 4.8%</td>
+              <td class="num">2,297 rows</td>
+            </tr>
+            <tr>
+              <td><strong>Random Forest (d=6, 200 trees)</strong></td>
+              <td class="num best">75.6% ± 8.4%</td>
+              <td class="num best">74.0% ± 10.8%</td>
+              <td class="num">2,297 rows</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Interpretation.</strong></p>
+      <ul>
+        <li>The Random Forest delivers a <strong>+22.7 pp absolute improvement</strong> on precision@200 over the Week-4 hand-written rule (75.6% vs. 52.9%), and a +15.9 pp improvement over label-by-chance (59.7%).</li>
+        <li>The Week-4 rule is worse than chance by 6.8 pp at K=200; this is expected: the rule was designed for <em>editorial triage</em> (sending only the clearest 56 rows to REFRESH) rather than for ranking precision. The Logistic Regression alone fixes this—the gain is not due to being a complex model.</li>
+        <li>RF is 2.1 pp better than LogReg at prec@200, but LogReg has a tighter std and a 1.2 pp advantage at prec@50. For cost-conscious deployment, either is defensible; RF is chosen for the playbook because the 95% confidence bands on client-held-out precision are acceptable once the baseline rule's ±15.5% variance is also acknowledged.</li>
+      </ul>
+
+      <figure id="fig1" aria-labelledby="fig1-cap">
+        <img src="./figures/paper_fig1_model_vs_baseline.png"
+             alt="Grouped bar chart comparing frozen Week-4 hand-written rule, Logistic Regression, and Random Forest on precision@200 and precision@50 across 5 client-held-out GroupShuffleSplit folds. Each bar shows the mean with standard deviation error bars. The Random Forest reaches 75.6% precision@200, 22.7 percentage points above the Week-4 rule at 52.9%. A dashed red base-rate line at 59.7% is annotated for reference."
+             width="1200" height="732" loading="lazy" decoding="async" />
+        <figcaption id="fig1-cap"><strong>Figure 1.</strong> Frozen Week-4 hand-written rule vs. Logistic Regression vs. Random Forest on 5 client-held-out GroupShuffleSplit folds. Bars show mean precision@K; error bars show ± 1 standard deviation. The Random Forest's precision@200 of 75.6% is 22.7 percentage points above the Week-4 rule (52.9%) and 15.9 pp above chance (59.7%).</figcaption>
+      </figure>
+
+      <h3 id="r-split">4.2 Why the split design matters: 14.2 pp inflation on a naive split</h3>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Same Random Forest, two split regimes. The gap demonstrates the cost of a naive shuffle that mixes clients across train/test.</caption>
+          <thead>
+            <tr>
+              <th>Regime</th>
+              <th class="num">prec@200 (mean ± std)</th>
+              <th class="num">prec@50 (mean ± std)</th>
+              <th class="num">Mean test base rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Base rate (label by chance)</td><td class="num">59.7%</td><td class="num">59.7%</td><td class="num">59.7%</td></tr>
+            <tr><td>Random ShuffleSplit (naive)</td><td class="num">89.8% ± 1.6%</td><td class="num">91.6% ± 1.7%</td><td class="num">60.0%</td></tr>
+            <tr><td><strong>GroupShuffleSplit by client (honest)</strong></td><td class="num best">75.6% ± 8.4%</td><td class="num best">74.0% ± 10.8%</td><td class="num">57.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The 14.2 pp gap (random → grouped) is the <em>exact reason</em> the validation design is grouped. Any future result that reports ≥ 85% on this dataset without a GroupShuffleSplit is, on this starter-slice evidence, inflated. The paper reports 75.6%.</p>
+
+      <figure id="fig2" aria-labelledby="fig2-cap">
+        <img src="./figures/paper_fig2_split_inflation.png"
+             alt="Bar chart showing the same Random Forest under two split regimes. A naive Random ShuffleSplit reports 89.8% precision@200 and 91.6% precision@50. The honest GroupShuffleSplit by client_id reports 75.6% and 74.0% respectively. An annotated arrow shows a split inflation of +14.2 percentage points on precision@200 and +17.6 on precision@50."
+             width="1200" height="732" loading="lazy" decoding="async" />
+        <figcaption id="fig2-cap"><strong>Figure 2.</strong> Same Random Forest on 5 folds under two split designs. Random ShuffleSplit (left pair) leaks client-memorized patterns into test and reports precision near 90%. GroupShuffleSplit by client_id (right pair) reports 75.6%—a 14.2 pp gap.</figcaption>
+      </figure>
+
+      <h3 id="r-staleness">4.3 The staleness signal that the rule leaned on (confirmed, not just assumed)</h3>
+
+      <p>The Week-4 rule uses staleness as its first leg. Figure 3 shows the signal is directionally real on the slice: severe-decline rate rises monotonically from 58.3% on &lt;90d pages to 74.3% on ≥180d pages, and median trend_pct drops from −30.8% to −44.5%.</p>
+
+      <figure id="fig3" aria-labelledby="fig3-cap">
+        <img src="./figures/paper_fig3_staleness_signal.png"
+             alt="Dual-axis figure with bars and a line across three staleness buckets: less than 90 days, 90 to 179 days, and 180 days or more. The bars (left axis) show severe-decline rate rising monotonically from 58.3% to 62.2% to 74.3%, with sample sizes inside each bar. The line (right axis) shows median trend percentage falling from approximately minus 30.8% to minus 32.6% to minus 44.5%."
+             width="1200" height="840" loading="lazy" decoding="async" />
+        <figcaption id="fig3-cap"><strong>Figure 3.</strong> Severe-decline rate (bars, left axis) rises monotonically across staleness buckets. Median trend_pct (line with markers, right axis) falls from −30.8% to −44.5%. Staleness ≥ 180d is the editorial triage threshold behind the baseline rule; cell size for the stale bucket is n = 35 on the starter export and grows on the warehouse.</figcaption>
+      </figure>
+
+      <div class="callout warn">
+        <h4>Small cell caveat</h4>
+        <p>The ≥ 180d bucket has n = 35 (1.6‰ of slice) on this export. The signal is monotonic but the tail cell is small. The signal audit labels staleness as <strong>CONFIRMED</strong> and the stale × CTR-below-tier-median editorial triage cell as <strong>FALSE (small-cell caveat)</strong>. The staleness feature is retained directionally; the figure is never leaned on alone.</p>
+      </div>
+
+      <h3 id="r-errors">4.4 Errors and interpretation</h3>
+      <p>Three error perspectives:</p>
+      <ul>
+        <li><strong>Permutation importance</strong> (best fold's held-out test): Top 3 features by drop in prec@200 when shuffled are <code>log_search_volume</code>, <code>position_filled</code>, <code>staleness_bucket</code> — matching the signal audit. No single feature dominates so much that its source would be suspicious (leakage-trap check).</li>
+        <li><strong>Classifier-calibration note:</strong> The playbook calibrates the 500 REFRESH cut using the <em>order</em>, not the absolute <code>p_severe_decline</code> value. The model's probabilities are ranked but not Platt-scaled; HIGH/MEDIUM/LOW confidence bands are score-quantile bands, not calibrated probabilities.</li>
+        <li><strong>Week-4 rule's high-variance error mode:</strong> Its baseline prec@200 std of ±15.5% across folds (vs. RF ± 8.4%) comes from the bucket integers' sensitivity to client composition in the held-out fold. RF smooths this variance partially—not fully, as the grouped split forces generalization.</li>
+      </ul>
+
+      <h3 id="r-wins">4.5 Rule wins / model wins analysis (hand-scoped cell)</h3>
+      <p>Both systems are correct for ~40–50% of the 200-item queue, but they disagree on specific slices:</p>
+      <ul>
+        <li>The Week-4 rule <strong>underrates</strong> pages with good CTR at average position and <em>low</em> word count (the FALSE word-count signal). RF surfaces them.</li>
+        <li>The Week-4 rule <strong>correctly beats</strong> RF on the VERY_STALE_HIGH_VIS archetype (n = 12) because the rule's integer staleness_bucket=2 pushes them to the top of REFRESH before RF can re-weight. This is why the bucket features are preserved as raw features in the model—they encode an editorial preference explicitly.</li>
+      </ul>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 5. PLAYBOOK ================= -->
+    <section id="playbook" aria-labelledby="play-h">
+      <h2 class="section-title" id="play-h"><span class="num">5</span>The Playbook (ranked recommendations on the 22,006-slice)</h2>
+
+      <p>The Random Forest produces <code>P(severe_decline)</code>. The playbook turns this score into an operational ranked queue with:</p>
+      <ul>
+        <li><strong>Rank:</strong> 1 (highest priority) → 22,006 (lowest).</li>
+        <li><strong>Action cut:</strong> Top 500 = REFRESH; next 1,500 = OBSERVE; remaining = IGNORE.</li>
+        <li><strong>Archetype reason code:</strong> each row bucketed into one of 5 archetypes (see Figure 4).</li>
+        <li><strong>Confidence band:</strong> HIGH band = top 78-percentile cutoff within REFRESH; MEDIUM = down to 62-percentile; LOW = below.</li>
+        <li><strong>Human-review flag:</strong> 4-item checklist. If ANY fires, the row is marked <code>human_review_required = True</code> with a reason.</li>
+      </ul>
+
+      <h3 id="p-pop">5.1 Population distribution</h3>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Playbook action distribution on the 22,006-page Lane-2 slice.</caption>
+          <thead>
+            <tr><th>Action</th><th class="num">Count (of 22,006)</th><th class="num">Share</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>REFRESH (top 500)</td><td class="num">500</td><td class="num">2.3%</td></tr>
+            <tr><td>OBSERVE (next 1,500)</td><td class="num">1,500</td><td class="num">6.8%</td></tr>
+            <tr><td>IGNORE (rest)</td><td class="num">20,006</td><td class="num">90.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure id="fig4" aria-labelledby="fig4-cap">
+        <img src="./figures/paper_fig4_playbook_archetypes.png"
+             alt="Horizontal stacked bar chart showing how five page archetypes are distributed across the three playbook action labels: REFRESH, OBSERVE, and IGNORE. The archetypes, from top to bottom, are VERY_STALE_HIGH_VIS, STRIKING_DISTANCE, CONTENT_DEPTH_GAP, MIXED_SIGNALS, and LOW_CTR_DECAY. The first two archetypes contribute the densest REFRESH candidates, while the last two are overwhelmingly IGNORE."
+             width="1200" height="732" loading="lazy" decoding="async" />
+        <figcaption id="fig4-cap"><strong>Figure 4.</strong> 5 archetype buckets (rows) stacked by action label (color). VERY_STALE_HIGH_VIS and STRIKING_DISTANCE contribute the densest REFRESH candidates. 90.9% of the 22,006 slice is IGNORE—good: most content needs no editor action this month.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <caption>Playbook archetype definitions and slice population.</caption>
+          <thead>
+            <tr><th>Archetype</th><th class="num">Count</th><th>Typical signal mix</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>LOW_CTR_DECAY</td><td class="num">13,027 (59.2%)</td><td>CTR below tier-median, no striking distance, no staleness trigger</td></tr>
+            <tr><td>MIXED_SIGNALS</td><td class="num">8,379 (38.1%)</td><td>Mixed CTR + mid-position + partial search volume</td></tr>
+            <tr><td>CONTENT_DEPTH_GAP</td><td class="num">306 (1.4%)</td><td>Word-count flag (NULL or &lt; 500) on high-vis + low-age pages</td></tr>
+            <tr><td>STRIKING_DISTANCE</td><td class="num">282 (1.3%)</td><td>avg_position 11–25 AND search_volume ≥ 100</td></tr>
+            <tr><td>VERY_STALE_HIGH_VIS</td><td class="num">12 (0.05%)</td><td>days_since_update ≥ 180 AND impressions_90d ≥ 10,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="p-nogo">5.2 What must NOT be automated (explicit no-go list)</h3>
+      <p>Five items are encoded as not-for-automation:</p>
+      <ol class="nogo-list">
+        <li>Automatic deletion or archival of pages — human editor must decide.</li>
+        <li>Automatic content refresh/rewrite itself (queue ordering only; editor writes).</li>
+        <li>Any change to client configuration, SEO plugin, or CMS settings.</li>
+        <li>Automatic override of <code>human_review_required = True</code> rows.</li>
+        <li>Any budget-allocation or billing decision from the ranking.</li>
+      </ol>
+      <p>This automation boundary is enforced by code checks (assertion that 0 IGNORE rows end up in REFRESH cut, etc.) and by the <code>human_review_required</code> flag on specific archetype rows.</p>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 6. RECOMMENDATIONS ================= -->
+    <section id="recommendations" aria-labelledby="recs-h">
+      <h2 class="section-title" id="recs-h"><span class="num">6</span>Ranked Recommendations</h2>
+
+      <p class="section-lead">Ordered by expected decision-support value, proportional to evidence strength. Every recommendation is a human action the model <em>supports</em>, not a causal guarantee.</p>
+
+      <article class="rec" aria-labelledby="r1-h">
+        <h3 id="r1-h"><span class="rank" aria-hidden="true">1</span>Prioritize the top-500 REFRESH queue by archetype tier. Send VERY_STALE_HIGH_VIS first.</h3>
+        <dl>
+          <dt>Action</dt>
+          <dd>Work VERY_STALE_HIGH_VIS (n=12, REFRESH top tier) → STRIKING_DISTANCE (n=282) → CONTENT_DEPTH_GAP (n=306) → remaining LOW_CTR_DECAY / MIXED_SIGNALS inside the 500.</dd>
+          <dt>Evidence</dt>
+          <dd>Very-stale pages show 74.3% severe-decline vs. 58.3% for fresh pages (Figure 3). Striking-distance pages already rank 11–25 on ≥ 100-volume keywords, so a refresh's upside on a real SERPs slot is directionally higher than a deep-rank refresh.</dd>
+          <dt>Expected usefulness</dt>
+          <dd>HIGH if editor capacity ≥ 100–200 / month. On held-out folds the 200-top REFRESH subset showed 75.6% severe-decline rate—that means 4 out of 5 pages in the editor's Monday queue actually <em>are</em> in decline and are not false-priority busywork.</dd>
+          <dt>Caveats</dt>
+          <dd>VERY_STALE_HIGH_VIS n = 12 on this slice. The claim is about the archetype, not the 12 specific pages; warehouse scaling increases sample size. The automation-no-go list applies: the queue is ordered, not auto-executed.</dd>
+          <dt>Validation in practice</dt>
+          <dd>Compare actual post-refresh impression recovery on the 500 vs. a 500-row control drawn from the IGNORE pool after 1 forward calendar month. Measure difference in medians, not only mean (heavy tails).</dd>
+        </dl>
+      </article>
+
+      <article class="rec" aria-labelledby="r2-h">
+        <h3 id="r2-h"><span class="rank" aria-hidden="true">2</span>Retire the Week-4 rule's pure-integer 0..5 ranking from operational queues. Keep the rule's three components as model features and as an auditable fallback.</h3>
+        <dl>
+          <dt>Action</dt>
+          <dd>For ordering, switch to the RF ranked score. For audit, the staleness/visibility/striking reason codes are printed on every row and match the rule's logic.</dd>
+          <dt>Evidence</dt>
+          <dd>The rule scored 52.9% prec@200 on the same grouped folds that RF scored 75.6%—a +22.7 pp gap. The rule's ±15.5% fold-to-fold std indicates it is sensitive to client composition; RF's std is tighter (±8.4%).</dd>
+          <dt>Expected usefulness</dt>
+          <dd>MEDIUM. The rule is human-readable and serves as a baseline-defense: if RF's score ever <em>regresses</em> below the rule's, a regression flag fires (the playbook includes this in monitoring / retrain triggers).</dd>
+          <dt>Caveats</dt>
+          <dd>Don't lose the reason codes—they are what make each top-row defensible.</dd>
+          <dt>Validation in practice</dt>
+          <dd>Monthly: recompute the Week-4 rule prec@200 vs. RF prec@200 on a new forward month, using the same grouped split. If RF falls below rule + 3 pp for 2 consecutive months, retrain (current top-200 severe-rate is 95.5%, retrain floor is 60%).</dd>
+        </dl>
+      </article>
+
+      <article class="rec" aria-labelledby="r3-h">
+        <h3 id="r3-h"><span class="rank" aria-hidden="true">3</span>For mid-queue (OBSERVE, ranks 501–2,000), apply CTR-vs-position-tier-delta check first before promoting to REFRESH.</h3>
+        <dl>
+          <dt>Action</dt>
+          <dd>Every OBSERVE row: compute its actual CTR vs. the within-position-tier median. If CTR ≥ tier-median AND position improved over 2 consecutive weekly snapshots, do not promote; the page is <em>holding</em> and the wrong thing would be to spend hours on it. If CTR &lt; tier-median, promote with archetype LOW_CTR_DECAY reason.</dd>
+          <dt>Evidence</dt>
+          <dd>CTR×position test in w04: top-3 pages show −23.9 pp severe-rate delta between high-CTR and low-CTR halves; page-1_4_10 shows −14.3 pp. This means CTR <em>within a rank tier</em> is the largest signal not captured by the RF's raw position/CTR interaction.</dd>
+          <dt>Expected usefulness</dt>
+          <dd>MEDIUM for a 2-editor team. The 1,500 OBSERVE row set is 3× the REFRESH set; filtering 15–25% of OBSERVE rows correctly saves ~200 wasted refresh briefs per month.</dd>
+          <dt>Caveats</dt>
+          <dd>Weekly snapshots are not in the starter export. On the warehouse, 28 days of daily deltas are required for this rule. Starter-export evidence is directional only.</dd>
+          <dt>Validation in practice</dt>
+          <dd>On the warehouse panel, run the OBSERVE promotion check and count how many of the promoted rows actually turn severe over the forward month. Target precision ≥ 70% on the promoted subset.</dd>
+        </dl>
+      </article>
+
+      <article class="rec" aria-labelledby="r4-h">
+        <h3 id="r4-h"><span class="rank" aria-hidden="true">4</span>Add a content-type flag in the model and drop raw <code>age_days</code> from a future release for news / feedly items.</h3>
+        <dl>
+          <dt>Action</dt>
+          <dd>In <code>word_count</code> / <code>staleness_bucket</code> feature construction, switch from global staleness thresholds to per-content-type thresholds. For news-style content, <code>days_since_update = 26 d</code> is not "fresh" in the same way a comparison article's 26 d is.</dd>
+          <dt>Evidence</dt>
+          <dd>The playbook's archetype-contained flag <code>review_block_reason</code> fires on 193 of the 2,000 REFRESH+OBSERVE rows (9.7%) with the message <code>signal_conflict: staleness conflicts with content_type_lifespan</code>.</dd>
+          <dt>Expected usefulness</dt>
+          <dd>LOW–MEDIUM (only 1.7% + 1.6% = 3.3% of the slice is not keyword articles). But a 10 pp error reduction on 3.3% of 22k is ~70 rows per release correctly moved, which is decision-useful.</dd>
+          <dt>Caveats</dt>
+          <dd>The content-type column is a 3-way coarse split in the starter; actual CMS types are richer. Warehouse deployment should use the real CMS <code>content_subtype</code>.</dd>
+          <dt>Validation in practice</dt>
+          <dd>On the warehouse panel, train two RF variants side-by-side: global-threshold baseline vs. per-content-type staleness thresholds. Measure difference in prec@200 on a new forward-month holdout; ship if ≥ +3 pp for 2 consecutive months.</dd>
+        </dl>
+      </article>
+
+      <article class="rec" aria-labelledby="r5-h">
+        <h3 id="r5-h"><span class="rank" aria-hidden="true">5</span>Do not deploy the score into any automated action without first passing a forward-month time-based holdout on the warehouse.</h3>
+        <dl>
+          <dt>Action</dt>
+          <dd>The current deployment artefact is a ranked CSV queue with human-review flags, NOT an API endpoint. Keep it there until: forward-month time-based holdout on warehouse (month T model, month T+1 label) achieves ≥ 68% prec@200 (the RF lower confidence bound); and leakage checklist item 4 is verified on the real warehouse panel.</dd>
+          <dt>Evidence</dt>
+          <dd>The validation audit (§3.8, 8/9 items, 1 unverified) and the 14.2 pp split-inflation gap both demonstrate how easy honest-looking numbers can become non-honest once the deployment context differs.</dd>
+          <dt>Expected usefulness</dt>
+          <dd>HIGH. This single recommendation prevents most downstream deploy failures.</dd>
+          <dt>Caveats</dt>
+          <dd>None. This is a safety gate, not a feature.</dd>
+          <dt>Validation in practice</dt>
+          <dd>Before any API deployment, run a two-month forward holdout: train on months 1…T−1, score month T, compare to actual labels from month T+1. Open the deployment gate only if prec@200 ≥ 68% AND leakage checklist item 4 passes on the warehouse month=2026-03 slice.</dd>
+        </dl>
+      </article>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 7. LIMITATIONS ================= -->
+    <section id="limitations" aria-labelledby="lim-h">
+      <h2 class="section-title" id="lim-h"><span class="num">7</span>Limitations &amp; Honest Framing</h2>
+
+      <h3>7.1 Starter-export scope, not warehouse</h3>
+      <p>All numbers in this paper come from the 30,000-row anonymized starter export and its 22,006-row Lane 2 slice. The numbers are: representative of <em>association patterns within the starter export</em> on the <em>two-panel</em> snapshot it ships; <strong>not</strong> forward-month predictions on the warehouse panel; <strong>not</strong> validated on a later calendar month (time-based holdout is a separate, required deployment gate); <strong>not</strong> applicable to clients outside the 30 represented.</p>
+
+      <h3>7.2 Label construction is proxy-level, not ground-truth</h3>
+      <p><code>severe_decline = trend_pct &lt; −20%</code> is a hand-thresholded proxy, not a confirmed "editor-should-have-refreshed" label. Actual recoveries after a refresh are not in the starter export; the playbook's recommendations assume that directing editor attention to a declining-page queue is directionally useful, but the paper provides no causal evidence that the REFRESH action on a specific page <em>caused</em> recovery.</p>
+
+      <h3>7.3 Staleness ≥ 180d cell size</h3>
+      <p>The ≥ 180d bucket has n = 35 (1.6‰) on this slice. Figure 3 is monotonic, so the signal direction is retained, but the precise 74.3% severe-decline figure for the stale cell has a wide confidence interval on this export. The figure is used directionally and should be re-measured on the warehouse month=2026-03 run.</p>
+
+      <h3>7.4 Grouped split but not time-based</h3>
+      <p>The grouped split prevents client memorization but does not prevent <em>calendar</em> drift—in real operations the model runs on month T and labels come from month T+1. The 5 GroupShuffleSplit folds are a cross-section, not a temporal holdout. Expect measured precision (75.6%) to be a lower-variance but possibly optimistic (up to a few pp) estimate of forward-month precision.</p>
+
+      <h3>7.5 Probabilities are ranked but not calibrated</h3>
+      <p>HIGH/MEDIUM/LOW bands are score quantiles, not calibrated P(decline | X). For ranking (queue order) this is acceptable. For any use that treats the number as a literal probability (e.g., expected-value revenue math), a Platt / isotonic calibration step is required on the warehouse holdout.</p>
+
+      <h3>7.6 Content-depth signal is directionally reversed on this slice</h3>
+      <p>The word-count long-form thesis scored <strong>FALSE</strong> on the starter export. The model retains <code>has_word_count</code> flag and <code>word_count_filled</code> with low weights via the bucket design, but no recommendation about word-count should be framed as "adding words helps the page" from this evidence alone.</p>
+
+      <h3>7.7 Heavy-tail dominance: small ranking changes can dominate outcomes</h3>
+      <p>Top 1% of pages by impressions hold 20.9% of all impressions. An ordering change in that 1% changes the aggregate opportunity number more than a 10% change on pages 5,000–10,000. As a result, prec@200 (not MAP / NDCG) is the primary metric; the paper never reports a global ranking metric without anchoring it to top-200 behavior.</p>
+
+      <h3>7.8 Missing feature: explicit keyword intent</h3>
+      <p>Intent-type features (informational / transactional / comparison) are absent in the starter export beyond the 3-way content-type split. Page-1 comparison articles that show declining CTR might need a CTA change, not a refresh—the playbook does not distinguish them.</p>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ================= 8. REPRODUCIBILITY ================= -->
+    <section id="reproducibility" aria-labelledby="repr-h">
+      <h2 class="section-title" id="repr-h"><span class="num">8</span>Reproducibility</h2>
+
+      <p>All results in this paper can be inspected or reproduced from the public research repository.</p>
+
+      <p>
+        <a class="repo-cta" href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer">
+          View research repository ↗
+        </a>
+      </p>
+
+      <h3 id="r-layout">8.1 Repository layout and primary notebook</h3>
+      <p>The primary source of truth is the executed capstone notebook. Supporting analysis notebooks (all executed, output cells populated) cover the end-to-end pipeline:</p>
+
+      <div class="repro-grid">
+        <div class="repro-card">
+          <h4>Primary</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/capstone.ipynb" target="_blank" rel="noopener noreferrer">capstone.ipynb</a></li>
+          </ul>
+        </div>
+        <div class="repro-card">
+          <h4>Framing &amp; contract</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w01_research_question.ipynb" target="_blank" rel="noopener noreferrer">w01_research_question</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w02_ml_task_framing.ipynb" target="_blank" rel="noopener noreferrer">w02_ml_task_framing</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w03_data_contract.ipynb" target="_blank" rel="noopener noreferrer">w03_data_contract</a></li>
+          </ul>
+        </div>
+        <div class="repro-card">
+          <h4>Baseline &amp; audit</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w04_baseline_score.ipynb" target="_blank" rel="noopener noreferrer">w04_baseline_score</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w04_signal_audit.ipynb" target="_blank" rel="noopener noreferrer">w04_signal_audit</a></li>
+          </ul>
+        </div>
+        <div class="repro-card">
+          <h4>Model &amp; validation</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w05_model.ipynb" target="_blank" rel="noopener noreferrer">w05_model</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w06_validation_audit.ipynb" target="_blank" rel="noopener noreferrer">w06_validation_audit</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/notebooks/w07_action_playbook.ipynb" target="_blank" rel="noopener noreferrer">w07_action_playbook</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 id="r-artefacts">8.2 Generated artefacts used by the paper</h3>
+
+      <div class="repro-grid">
+        <div class="repro-card">
+          <h4>Output tables</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/outputs/baseline_metrics.json" target="_blank" rel="noopener noreferrer">baseline_metrics.json</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/outputs/signal_audit_receipt.json" target="_blank" rel="noopener noreferrer">signal_audit_receipt.json</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/outputs/model_comparison.json" target="_blank" rel="noopener noreferrer">model_comparison.json</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/outputs/validation_audit.json" target="_blank" rel="noopener noreferrer">validation_audit.json</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/outputs/playbook_summary.json" target="_blank" rel="noopener noreferrer">playbook_summary.json</a></li>
+          </ul>
+        </div>
+        <div class="repro-card">
+          <h4>Figures &amp; paper assets</h4>
+          <ul>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/figures/paper_fig1_model_vs_baseline.png" target="_blank" rel="noopener noreferrer">fig1_model_vs_baseline</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/figures/paper_fig2_split_inflation.png" target="_blank" rel="noopener noreferrer">fig2_split_inflation</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/figures/paper_fig3_staleness_signal.png" target="_blank" rel="noopener noreferrer">fig3_staleness_signal</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/figures/paper_fig4_playbook_archetypes.png" target="_blank" rel="noopener noreferrer">fig4_playbook_archetypes</a></li>
+            <li><a href="https://github.com/Lakes41/flyrank-ml/blob/main/work/research_paper.md" target="_blank" rel="noopener noreferrer">research_paper.md (source)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 id="r-from-scratch">8.3 Reproducing from scratch</h3>
+      <ol>
+        <li>Ensure Python ≥ 3.10, with <code>pandas</code>, <code>numpy</code>, <code>duckdb</code>, <code>scikit-learn</code>, <code>matplotlib</code> installed.</li>
+        <li>Confirm <code>data/raw/content_refresh_anonymized.csv</code> exists (the starter fallback; no <code>HF_TOKEN</code> needed).</li>
+        <li>Execute notebooks in order w03 → w04_baseline → w04_signal_audit → w05 → w06 → w07 (each uses the artifacts of the prior notebooks).</li>
+        <li>Regenerate PNG figures from the JSON outputs (figure-generation code is in the repo's work pipeline).</li>
+        <li>Then run <code>capstone.ipynb</code>, which mirrors this paper.</li>
+      </ol>
+      <p><code>random_state = 42</code> everywhere it appears, and splits are seeded, so grouped-fold results are deterministic relative to the starter export.</p>
+    </section>
+
+    <!-- ================= 9. ACKS ================= -->
+    <section id="acknowledgments" class="acks" aria-labelledby="acks-h">
+      <h2 class="section-title" id="acks-h"><span class="num">9</span>Acknowledgments &amp; Data Credit</h2>
+
+      <p>Built on the <a href="https://flyrank.ai" target="_blank" rel="noopener noreferrer">FlyRank</a> ML Internship dataset. The anonymized starter CSV fallback and the gated Hugging Face warehouse release (FlyRank / internship-warehouse) were prepared by the FlyRank internship program for this research project. The author thanks the program team for the Search Console + Analytics pipeline walk-throughs, the flag-motivation sessions, and for publishing a dual-backend release that lets the same notebooks run on a local starter export without credentials.</p>
+
+      <p>Any errors in methodology, framing, or the honest-score numbers are the author's.</p>
+    </section>
+
+    <footer class="page-footer" role="contentinfo">
+      <p>&copy; Amir Oyeleke. Research artefact for the FlyRank ML Internship program.</p>
+      <p>Starter-export scope · Associative evidence only · Not causal.</p>
+    </footer>
+  </main>
+</div>
+
+<script src="./app.js" defer></script>
+</body>
+</html>
