@@ -110,6 +110,21 @@ a:hover { text-decoration: underline; }
   font-weight: 500;
 }
 .sitenav .sub a { padding-left: 24px; font-size: 12.5px; }
+.sitenav li.is-active-branch > a {
+  color: var(--fg);
+  font-weight: 500;
+  border-left-color: var(--border-strong);
+}
+.sitenav ul.sub {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.15s ease;
+  opacity: 0.45;
+}
+.sitenav ul.sub.is-active-parent {
+  max-height: 800px;
+  opacity: 1;
+}
 
 .nav-toggle {
   display: none;
