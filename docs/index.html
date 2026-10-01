@@ -28,13 +28,14 @@
 
 <div class="page">
   <nav id="sitenav" class="sitenav" aria-label="Section navigation">
-    <h2>Contents</h2>
+    <div class="sitenav-brand">FLYRANK</div>
+    <div class="sitenav-subtitle">ML CASE STUDY</div>
     <ul>
       <li><a href="#overview" class="nav-top">Overview</a></li>
       <li><a href="#problem" class="nav-top">Problem</a></li>
       <li><a href="#approach" class="nav-top">Approach</a></li>
       <li><a href="#results" class="nav-top">Results</a></li>
-      <li><a href="#playbook" class="nav-top">Product / Playbook</a></li>
+      <li><a href="#playbook" class="nav-top">Playbook</a></li>
       <li><a href="#validation" class="nav-top">Validation</a></li>
       <li><a href="#recommendations" class="nav-top">Recommendations</a></li>
       <li class="nav-divider" aria-hidden="true"></li>
@@ -49,76 +50,106 @@
   <main id="main">
     <!-- ================= HERO ================= -->
     <header class="hero" role="banner">
-      <div class="hero-content">
+      <div class="hero-left">
         <p class="hero-kicker">FLYRANK · ML INTERNSHIP CAPSTONE</p>
         <h1 class="hero-title">Which content pages should editors review first?</h1>
-        <p class="hero-subtitle">An ML ranking system for prioritising content refreshes using client-held-out validation</p>
+        <p class="hero-description">An ML ranking system for prioritising content refreshes using client-held-out validation.</p>
         
         <div class="hero-author">
           <span class="author-name">Amir Oyeleke</span>
-          <span class="author-role">Machine Learning Engineering</span>
-          <a href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer" class="author-link">Repository</a>
-          <span class="author-sep" aria-hidden="true">·</span>
-          <a href="https://github.com/lakes41/" target="_blank" rel="noopener noreferrer" class="author-link">GitHub</a>
-          <span class="author-sep" aria-hidden="true">·</span>
-          <a href="https://www.linkedin.com/in/amir-oyeleke-5b3168296" target="_blank" rel="noopener noreferrer" class="author-link">LinkedIn</a>
+          <span class="author-role">Machine Learning Engineer</span>
         </div>
 
         <div class="hero-cta">
           <a href="#results" class="btn btn-primary">View Results</a>
-          <a href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">View Repository</a>
+          <a href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">View Repository ↗</a>
         </div>
       </div>
 
-      <div class="hero-metrics">
-        <div class="metric metric-primary">
-          <div class="metric-value">75.6%</div>
-          <div class="metric-label">Random Forest<br>precision@200</div>
+      <div class="hero-right">
+        <div class="hero-metrics-panel">
+          <div class="metrics-panel-header">MODEL RESULT</div>
+          
+          <div class="hero-metric-primary">
+            <div class="hero-metric-value">75.6%</div>
+            <div class="hero-metric-label">Precision@200</div>
+            <div class="hero-metric-sublabel">Random Forest</div>
+          </div>
+
+          <div class="hero-metric-diff">
+            <div class="hero-metric-diff-value">+22.7pp</div>
+            <div class="hero-metric-diff-label">vs existing rule</div>
+          </div>
+
+          <div class="hero-metric-impact">
+            <div class="hero-metric-impact-value">+45</div>
+            <div class="hero-metric-impact-label">additional useful pages per 200 reviewed</div>
+          </div>
+
+          <div class="hero-baseline">
+            <div class="hero-baseline-label">Baseline comparison</div>
+            <div class="hero-baseline-value">52.9%</div>
+            <div class="hero-baseline-name">Existing rule</div>
+          </div>
         </div>
-        <div class="metric metric-secondary">
-          <div class="metric-value">52.9%</div>
-          <div class="metric-label">Existing Rule<br>precision@200</div>
-        </div>
-        <div class="metric metric-impact">
-          <div class="metric-value">+45</div>
-          <div class="metric-label">useful pages / 200</div>
-        </div>
-        <div class="metric metric-context">
-          <div class="metric-value">22,006</div>
-          <div class="metric-label">pages · 30 clients · 5 folds</div>
+
+        <div class="hero-metadata">
+          <div class="hero-metadata-item">
+            <span class="hero-metadata-value">22,006</span>
+            <span>eligible pages</span>
+          </div>
+          <div class="hero-metadata-item">
+            <span class="hero-metadata-value">30</span>
+            <span>clients</span>
+          </div>
+          <div class="hero-metadata-item">
+            <span class="hero-metadata-value">5</span>
+            <span>validation folds</span>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- ================= OVERVIEW ================= -->
     <section id="overview" aria-labelledby="overview-h">
+      <div class="section-eyebrow">PROJECT AT A GLANCE</div>
       <h2 class="section-title" id="overview-h">Overview</h2>
       
       <div class="overview-grid">
         <div class="overview-item">
-          <h3>The Problem</h3>
-          <p>Content teams must decide each month which pages to refresh, but with thousands of pages in the queue and traffic concentrated in a heavy-tailed top tier, human triage alone misses high-value opportunities.</p>
+          <div class="overview-number">01</div>
+          <div class="overview-label">Problem</div>
+          <div class="overview-content">22,006 eligible pages compete for limited review capacity.</div>
         </div>
         <div class="overview-item">
-          <h3>The Approach</h3>
-          <p>We compare a frozen hand-written prioritisation rule against machine-learning models (Logistic Regression and Random Forest) using client-held-out validation to ensure realistic performance estimates.</p>
+          <div class="overview-number">02</div>
+          <div class="overview-label">Approach</div>
+          <div class="overview-content">Compare the existing prioritisation rule with learned ranking models.</div>
         </div>
         <div class="overview-item">
-          <h3>The Result</h3>
-          <p>Within a 200-page monthly review capacity, the Random Forest identifies approximately 45 additional severe-decline pages compared with the existing rule — a +22.7 percentage-point improvement on honest client-held-out splits.</p>
-        </div>
-        <div class="overview-item">
-          <h3>Why It Matters</h3>
-          <p>The improvement is real and honest, not inflated by client-memorization. Publishing 45 more real priorities each month is a tangible time win for an editor team — it moves more of the queue from guesswork to evidence.</p>
+          <div class="overview-number">03</div>
+          <div class="overview-label">Outcome</div>
+          <div class="overview-content">75.6% Precision@200 and approximately 45 additional useful pages.</div>
         </div>
       </div>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= PROBLEM ================= -->
-    <section id="problem" aria-labelledby="problem-h">
+    <section id="problem" aria-labelledby="problem-h" class="section-surface-white">
+      <div class="section-eyebrow">THE PROBLEM</div>
       <h2 class="section-title" id="problem-h">Problem</h2>
+
+      <div class="problem-scale">
+        <div class="problem-scale-header">The scale of the challenge</div>
+        <div class="problem-scale-value">22,006 eligible pages</div>
+        <div class="problem-scale-bar">
+          <div class="problem-scale-bar-fill problem-scale-large"></div>
+        </div>
+        <p class="text-secondary">Only 200 can realistically be reviewed each month.</p>
+        <div class="problem-scale-bar">
+          <div class="problem-scale-bar-fill problem-scale-small"></div>
+        </div>
+      </div>
 
       <p>FlyRank content teams publish long-form keyword articles at scale. Search traffic follows a heavy-tailed distribution: on the evaluated slice the top 1% of pages by <span class="feature">impressions</span> account for <strong>20.9%</strong> of the total 90-day <span class="feature">impressions</span>, and the top 1% by clicks for <strong>30.4%</strong> of clicks. A few wrong decisions concentrate a lot of missed opportunity, so the order in which pages land on the review queue matters more than a global classification.</p>
 
@@ -134,109 +165,117 @@
       <p>Lane 2, the subset of pages eligible for the content-priority workflow (pages with enough traffic to measure reliably): pages with ≥ 100 <span class="feature">impressions</span> over 90 days, excluding sentinel-zero-position rows that have fewer than 500 <span class="feature">impressions</span>, and excluding pages younger than 90 days from content publication. The label is an observed <em>post hoc</em> severe-decline indicator (<code>trend_pct &lt; −20%</code>) computed on the starter export's two-panel snapshot.</p>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= APPROACH ================= -->
     <section id="approach" aria-labelledby="approach-h">
+      <div class="section-eyebrow">THE APPROACH</div>
       <h2 class="section-title" id="approach-h">Approach</h2>
 
-      <div class="approach-visual">
-        <div class="approach-step">
-          <h4>Existing Method</h4>
-          <p>The frozen hand-written baseline scores every page on three integer buckets:</p>
+      <div class="approach-comparison">
+        <div class="approach-column">
+          <div class="approach-header">Existing Method</div>
           <div class="approach-diagram">
-            <div class="diagram-box">Staleness</div>
-            <span class="diagram-plus">+</span>
-            <div class="diagram-box">Visibility</div>
-            <span class="diagram-plus">+</span>
-            <div class="diagram-box">Striking Distance</div>
-            <span class="diagram-arrow">↓</span>
-            <div class="diagram-result">Priority Score (0–5)</div>
+            <div class="approach-node">Staleness</div>
+            <div class="approach-plus">+</div>
+            <div class="approach-node">Visibility</div>
+            <div class="approach-plus">+</div>
+            <div class="approach-node">Striking distance</div>
+            <div class="approach-arrow">↓</div>
+            <div class="approach-node">Priority score</div>
           </div>
         </div>
 
-        <div class="approach-step">
-          <h4>ML Method</h4>
-          <p>The Random Forest re-uses the same three bucket components plus eight additional signals:</p>
-          <div class="approach-diagram">
-            <div class="diagram-box-small">Staleness</div>
-            <div class="diagram-box-small">Visibility</div>
-            <div class="diagram-box-small">Striking Distance</div>
-            <div class="diagram-box-small">CTR</div>
-            <div class="diagram-box-small">Position</div>
-            <div class="diagram-box-small">Search Volume</div>
-            <div class="diagram-box-small">Content Age</div>
-            <div class="diagram-box-small">Word Count</div>
-            <div class="diagram-box-small">+ Interactions</div>
-            <span class="diagram-arrow">↓</span>
-            <div class="diagram-result">Probability / Ranking</div>
-          </div>
-        </div>
+        <div class="approach-vs">VS</div>
 
-        <div class="approach-step">
-          <h4>Outcome</h4>
-          <p>Within the same 200-page review capacity:</p>
-          <div class="approach-comparison">
-            <div class="comparison-item">
-              <span class="comparison-label">Existing Rule</span>
-              <span class="comparison-value">~106 useful pages</span>
-            </div>
-            <div class="comparison-arrow">→</div>
-            <div class="comparison-item comparison-better">
-              <span class="comparison-label">Random Forest</span>
-              <span class="comparison-value">~151 useful pages</span>
-            </div>
-            <div class="comparison-diff">+45 additional useful pages</div>
+        <div class="approach-column">
+          <div class="approach-header">ML Method</div>
+          <div class="approach-diagram">
+            <div class="approach-node">Rule signals</div>
+            <div class="approach-plus">+</div>
+            <div class="approach-node">Search performance</div>
+            <div class="approach-plus">+</div>
+            <div class="approach-node">Content characteristics</div>
+            <div class="approach-arrow">↓</div>
+            <div class="approach-node">Probability of decline</div>
+            <div class="approach-arrow">↓</div>
+            <div class="approach-node">Ranked queue</div>
           </div>
         </div>
       </div>
 
-      <h3>Pipeline</h3>
+      <h3>ML Pipeline</h3>
       <div class="pipeline">
-        <div class="pipeline-step">Raw dataset</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">Eligibility filters</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">22,006 eligible pages</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">Known-before features</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">Client-held-out evaluation (5 folds)</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step pipeline-branch">
-          <div>Baseline</div>
-          <div>Logistic Regression</div>
-          <div>Random Forest</div>
+        <div class="pipeline-node">30,000 pages</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-node">Eligibility filters</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-node">22,006 eligible pages</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-node">Known-before features</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-node">Client-held-out validation</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-branch">
+          <div class="pipeline-branch-item">Existing rule</div>
+          <div class="pipeline-branch-item">Logistic Regression</div>
+          <div class="pipeline-branch-item">Random Forest</div>
         </div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">Ranked decline score</div>
-        <div class="pipeline-arrow">↓</div>
-        <div class="pipeline-step">Editorial action (REFRESH / OBSERVE / IGNORE)</div>
+        <div class="pipeline-line"></div>
+        <div class="pipeline-node">Ranked editorial queue</div>
       </div>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= RESULTS ================= -->
-    <section id="results" aria-labelledby="results-h">
+    <section id="results" aria-labelledby="results-h" class="section-surface-dark">
+      <div class="section-eyebrow">THE RESULTS</div>
       <h2 class="section-title" id="results-h">Results</h2>
 
-      <div class="results-hero">
-        <div class="results-metric">
-          <div class="results-value">75.6%</div>
-          <div class="results-label">Precision@200</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6); margin: var(--space-8) 0;">
+        <div>
+          <div style="font-family: var(--font-display); font-size: 64px; font-weight: 700; line-height: 1; color: var(--accent); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">75.6%</div>
+          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7); text-transform: uppercase; letter-spacing: 0.06em;">Precision@200</div>
         </div>
-        <div class="results-diff">
-          <div class="results-diff-value">+22.7 pp</div>
-          <div class="results-diff-label">vs existing rule</div>
+        <div>
+          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--success); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+22.7pp</div>
+          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7);">vs existing rule</div>
         </div>
-        <div class="results-impact">
-          <div class="results-impact-value">+45</div>
-          <div class="results-impact-label">additional useful pages per 200 reviewed</div>
+        <div>
+          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--success); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+45</div>
+          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7);">additional useful pages per 200 reviewed</div>
         </div>
       </div>
 
       <h3>Model Comparison</h3>
+      <div class="results-bars">
+        <div class="results-bar-row">
+          <div class="results-bar-label">Random Forest</div>
+          <div class="results-bar-track">
+            <div class="results-bar-fill" style="width: 75.6%;"></div>
+          </div>
+          <div class="results-bar-value">75.6%</div>
+        </div>
+        <div class="results-bar-row">
+          <div class="results-bar-label">Logistic Regression</div>
+          <div class="results-bar-track">
+            <div class="results-bar-fill" style="width: 73.5%;"></div>
+          </div>
+          <div class="results-bar-value">73.5%</div>
+        </div>
+        <div class="results-bar-row">
+          <div class="results-bar-label">Base rate</div>
+          <div class="results-bar-track">
+            <div class="results-bar-fill base-rate" style="width: 59.7%;"></div>
+          </div>
+          <div class="results-bar-value">59.7%</div>
+        </div>
+        <div class="results-bar-row">
+          <div class="results-bar-label">Existing rule</div>
+          <div class="results-bar-track">
+            <div class="results-bar-fill baseline" style="width: 52.9%;"></div>
+          </div>
+          <div class="results-bar-value">52.9%</div>
+        </div>
+      </div>
+
       <div class="table-wrap">
         <table>
           <caption>Fair model-vs-baseline comparison on 5 client-held-out GroupShuffleSplit folds, same 11 features. Primary metric: precision@200.</caption>
@@ -287,7 +326,7 @@
       </figure>
 
       <h3 id="results-staleness">Staleness Signal</h3>
-      <p>The hand-written baseline uses <span class="feature">staleness</span> as its first leg. Figure 3 shows the signal is directionally real on the slice: severe-decline rate rises monotonically from 58.3% on &lt;90d pages to 74.3% on ≥180d pages, and median <code>trend_pct</code> drops from −30.8% to −44.5%.</p>
+      <p class="text-secondary">The hand-written baseline uses <span class="feature">staleness</span> as its first leg. Figure 3 shows the signal is directionally real on the slice: severe-decline rate rises monotonically from 58.3% on &lt;90d pages to 74.3% on ≥180d pages, and median <code>trend_pct</code> drops from −30.8% to −44.5%.</p>
 
       <figure id="fig3" aria-labelledby="fig3-cap">
         <img src="./figures/paper_fig3_staleness_signal.png"
@@ -296,34 +335,33 @@
         <figcaption id="fig3-cap"><strong>Figure 3.</strong> Severe-decline rate (bars, left axis) rises monotonically across <span class="feature">staleness</span> buckets. Median <code>trend_pct</code> (line with markers, right axis) falls from −30.8% to −44.5%. <span class="feature">Staleness</span> ≥ 180d is the editorial triage threshold behind the baseline rule; cell size for the stale bucket is n = 35 on the starter export and grows on the warehouse.</figcaption>
       </figure>
 
-      <div class="callout warn">
+      <div class="callout">
         <h4>Small cell caveat</h4>
         <p>The ≥ 180d bucket has n = 35 (1.6‰ of slice) on this export. The signal is monotonic but the tail cell is small. The signal audit labels <span class="feature">staleness</span> as <strong>CONFIRMED</strong> and the stale × CTR-below-tier-median editorial triage cell as <strong>FALSE (small-cell caveat)</strong>. The <span class="feature">staleness</span> feature is retained directionally; the figure is never leaned on alone.</p>
       </div>
     </section>
 
-    <hr class="divider" />
-
-    <!-- ================= PRODUCT / PLAYBOOK ================= -->
-    <section id="playbook" aria-labelledby="play-h">
-      <h2 class="section-title" id="play-h">Product / Playbook</h2>
+    <!-- ================= PLAYBOOK ================= -->
+    <section id="playbook" aria-labelledby="play-h" class="section-surface-white">
+      <div class="section-eyebrow">PRODUCT / PLAYBOOK</div>
+      <h2 class="section-title" id="play-h">Playbook</h2>
 
       <p>The Random Forest produces <code>P(severe_decline)</code>. The playbook turns this score into an operational ranked queue with three action labels:</p>
 
       <div class="action-grid">
         <div class="action-card action-refresh">
-          <div class="action-icon">REFRESH</div>
-          <h4>Prioritise for editorial review</h4>
+          <div class="action-badge">REFRESH</div>
+          <h4>High-priority intervention</h4>
           <p>Top 500 pages by score — roughly 2.3% of the slice. These pages are the most likely to actually be in severe decline; send them to the top of the sprint backlog.</p>
         </div>
         <div class="action-card action-observe">
-          <div class="action-icon">OBSERVE</div>
-          <h4>Monitor before taking action</h4>
+          <div class="action-badge">OBSERVE</div>
+          <h4>Monitor before intervention</h4>
           <p>Next 1,500 pages — roughly 6.8% of the slice. Keep an eye on them for one cycle, re-score next month; promote to REFRESH only if <span class="feature">CTR</span> or <span class="feature">average search position</span> worsens.</p>
         </div>
         <div class="action-card action-ignore">
-          <div class="action-icon">IGNORE</div>
-          <h4>No immediate review priority</h4>
+          <div class="action-badge">IGNORE</div>
+          <h4>No immediate action</h4>
           <p>Remaining 20,006 pages — roughly 90.9% of the slice. This is the correct majority behaviour: most content needs nothing done to it in a given month.</p>
         </div>
       </div>
@@ -360,27 +398,30 @@
       </ol>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= VALIDATION ================= -->
-    <section id="validation" aria-labelledby="val-h">
+    <section id="validation" aria-labelledby="val-h" class="section-surface-validation">
+      <div class="section-eyebrow">VALIDATION</div>
       <h2 class="section-title" id="val-h">Validation</h2>
+
+      <p class="section-lead">A higher score was available. We chose not to use it as the headline result.</p>
 
       <p>A normal random split made the model appear substantially better because pages from the same clients could appear in both training and testing. The technical comparison between the two regimes is shown below.</p>
 
       <div class="validation-comparison">
-        <div class="validation-col validation-naive">
-          <h4>Naive Split</h4>
-          <div class="validation-metric">89.8%</div>
-          <p>Same clients may appear across training and test</p>
-          <p class="validation-note">Higher-looking result</p>
+        <div class="validation-column naive">
+          <div class="validation-header">Naive Split</div>
+          <div class="validation-value">89.8%</div>
+          <p class="validation-description">Same clients may appear in train and test.</p>
+          <p class="validation-note">Optimistic estimate.</p>
         </div>
+
         <div class="validation-arrow">→</div>
-        <div class="validation-col validation-honest">
-          <h4>Client-Held-Out Split</h4>
-          <div class="validation-metric">75.6%</div>
-          <p>Entire clients held out from training</p>
-          <p class="validation-note">More realistic estimate of unseen-client performance</p>
+
+        <div class="validation-column honest">
+          <div class="validation-header">Client-Held-Out</div>
+          <div class="validation-value">75.6%</div>
+          <p class="validation-description">Entire clients withheld from training.</p>
+          <p class="validation-note">More realistic unseen-client evaluation.</p>
         </div>
       </div>
 
@@ -423,10 +464,9 @@
       </ul>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= RECOMMENDATIONS ================= -->
-    <section id="recommendations" aria-labelledby="recs-h">
+    <section id="recommendations" aria-labelledby="recs-h" class="section-surface-white">
+      <div class="section-eyebrow">RECOMMENDATIONS</div>
       <h2 class="section-title" id="recs-h">Recommendations</h2>
 
       <p class="section-lead">Ordered by expected decision-support value, proportional to evidence strength. Every recommendation is a human action the model <em>supports</em>, not a causal guarantee.</p>
@@ -512,10 +552,9 @@
       </article>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= DATA (TECHNICAL) ================= -->
-    <section id="data" aria-labelledby="data-h">
+    <section id="data" aria-labelledby="data-h" class="section-surface-alt">
+      <div class="section-eyebrow">TECHNICAL</div>
       <h2 class="section-title section-title-technical" id="data-h">Data</h2>
 
       <div class="preamble">
@@ -655,10 +694,9 @@
       <p>This exclusion set is checked in two places: the Lane-2 eligibility filter's leakage harness (column-set intersection, measured prec@200 jumps from 78.4% to 100% when label-derived columns are added), and the validation audit's 9-point leakage taxonomy attack.</p>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= METHODOLOGY (TECHNICAL) ================= -->
     <section id="methodology" aria-labelledby="meth-h">
+      <div class="section-eyebrow">TECHNICAL</div>
       <h2 class="section-title section-title-technical" id="meth-h">Methodology</h2>
 
       <div class="preamble">
@@ -753,7 +791,7 @@
         <p><strong>The numbers.</strong> When the same Random Forest is evaluated with a naive page-level shuffle (clients mixed in both halves), the measured precision@200 is <strong>89.8%</strong>. With the honest grouped split it is <strong>75.6%</strong>. The −14.2 percentage-point gap is exactly the amount of client-level memorization the grouped split removes. The lower, honest number (75.6%) is reported as the paper's result because it is the better estimate of what an unseen new client would experience. In later sections this split-design difference is shown in a dedicated table and chart.</p>
       </div>
 
-      <div class="callout warn" aria-label="Validation design caution">
+      <div class="callout">
         <h4>Honest split design — formal parameters</h4>
         <p><code>GroupShuffleSplit(n_splits=5, test_size=0.2, random_state=42)</code> grouped by <code>client_id</code>. A client never contributes rows to both train and test inside a single fold.</p>
       </div>
@@ -786,10 +824,9 @@
       <p>Primary: <strong>precision@200</strong> on the client-held-out test fold. Secondary: <strong>precision@50</strong> (the "first day of the sprint" queue—reviewers want the 50 highest-value actions done first). Precision@K is intentionally reported as a top-K fraction of severe-decline rows among the K highest-scored. Base rate is printed next to every metric; a result of 70% on a 59.7% base rate is a ~10 pp lift, not a 70% hit rate in isolation.</p>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= LIMITATIONS (TECHNICAL) ================= -->
-    <section id="limitations" aria-labelledby="lim-h">
+    <section id="limitations" aria-labelledby="lim-h" class="section-surface-alt">
+      <div class="section-eyebrow">TECHNICAL</div>
       <h2 class="section-title section-title-technical" id="lim-h">Limitations &amp; Honest Framing — <em>What this research cannot tell us</em></h2>
 
       <div class="limitations-intro">
@@ -827,10 +864,9 @@
       <p>Intent-type features (informational / transactional / comparison) are absent in the starter export beyond the 3-way content-type split. Page-1 comparison articles that show declining <span class="feature">CTR</span> might need a CTA change, not a refresh—the playbook does not distinguish them.</p>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= REPRODUCIBILITY (TECHNICAL) ================= -->
     <section id="reproducibility" aria-labelledby="repr-h">
+      <div class="section-eyebrow">TECHNICAL</div>
       <h2 class="section-title section-title-technical" id="repr-h">Reproducibility</h2>
 
       <p>All results in this paper can be inspected or reproduced from the public research repository.</p>
@@ -912,8 +948,6 @@
       <p><code>random_state = 42</code> everywhere it appears, and splits are seeded, so grouped-fold results are deterministic relative to the starter export.</p>
     </section>
 
-    <hr class="divider" />
-
     <!-- ================= ACKNOWLEDGMENTS (TECHNICAL) ================= -->
     <section id="acknowledgments" class="acks" aria-labelledby="acks-h">
       <h2 class="section-title section-title-technical" id="acks-h">Acknowledgments &amp; Data Credit</h2>
@@ -923,9 +957,17 @@
       <p>I am also grateful for the opportunity to apply practical machine-learning methods to a real-world prioritisation problem, with a strong emphasis on reproducibility, careful validation, and honest interpretation of results. Any conclusions, limitations, and recommendations presented here are my own and should be understood within the scope of the dataset and methodology used in this study.</p>
     </section>
 
+    <!-- ================= FOOTER ================= -->
     <footer class="page-footer" role="contentinfo">
-      <p>&copy; Amir Oyeleke. Research artefact for the FlyRank ML Internship program.</p>
-      <p>Starter-export scope · Associative evidence only · Not causal.</p>
+      <div class="footer-brand">FLYRANK ML CAPSTONE</div>
+      <div class="footer-title">Machine-learning ranking for content refresh prioritisation.</div>
+      <div class="footer-description">An ML internship capstone demonstrating honest validation, client-held-out evaluation, and decision-support ranking for editorial content prioritisation.</div>
+      <div class="footer-author">Amir Oyeleke</div>
+      <div class="footer-links">
+        <a href="https://github.com/Lakes41/flyrank-ml" target="_blank" rel="noopener noreferrer">Repository ↗</a>
+        <a href="https://github.com/lakes41/" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a href="https://www.linkedin.com/in/amir-oyeleke-5b3168296" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+      </div>
     </footer>
   </main>
 </div>
