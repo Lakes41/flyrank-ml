@@ -1163,6 +1163,15 @@ figure figcaption strong { color: var(--text-primary); }
   color: var(--validation);
 }
 
+.callout.accent {
+  border-left-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.callout.accent h4 {
+  color: var(--accent);
+}
+
 .callout p:last-child { margin-bottom: 0; }
 
 /* ========== RECOMMENDATIONS ========== */

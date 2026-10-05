@@ -225,22 +225,22 @@
     </section>
 
     <!-- ================= RESULTS ================= -->
-    <section id="results" aria-labelledby="results-h" class="section-surface-dark">
+    <section id="results" aria-labelledby="results-h" class="section-surface-white">
       <div class="section-eyebrow">THE RESULTS</div>
       <h2 class="section-title" id="results-h">Results</h2>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6); margin: var(--space-8) 0;">
         <div>
           <div style="font-family: var(--font-display); font-size: 64px; font-weight: 700; line-height: 1; color: var(--accent); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">75.6%</div>
-          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7); text-transform: uppercase; letter-spacing: 0.06em;">Precision@200</div>
+          <div style="font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Precision@200</div>
         </div>
         <div>
-          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--success); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+22.7pp</div>
-          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7);">vs existing rule</div>
+          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--accent); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+22.7pp</div>
+          <div style="font-size: 14px; color: var(--text-muted);">vs existing rule</div>
         </div>
         <div>
-          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--success); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+45</div>
-          <div style="font-size: 14px; color: rgba(245, 245, 245, 0.7);">additional useful pages per 200 reviewed</div>
+          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--accent); margin-bottom: var(--space-2); font-variant-numeric: tabular-nums;">+45</div>
+          <div style="font-size: 14px; color: var(--text-muted);">additional useful pages per 200 reviewed</div>
         </div>
       </div>
 
@@ -316,7 +316,10 @@
         </table>
       </div>
 
-      <div class="takeaway"><strong>Takeaway.</strong> Both machine-learned systems beat the hand-written baseline by a wide margin. The Logistic Regression alone (73.5% ± 6.9% prec@200) delivers most of the benefit; moving to a Random Forest adds a further <strong>+2.1 pp</strong>. Because the hand-written baseline's components are preserved as raw features in both models, the models can trivially reproduce the rule — any gain must come from combining the remaining eight signals more effectively.</div>
+      <div class="callout accent">
+        <h4>Takeaway</h4>
+        <p>Both machine-learned systems beat the hand-written baseline by a wide margin. The Logistic Regression alone (73.5% ± 6.9% prec@200) delivers most of the benefit; moving to a Random Forest adds a further <strong>+2.1 pp</strong>. Because the hand-written baseline's components are preserved as raw features in both models, the models can trivially reproduce the rule — any gain must come from combining the remaining eight signals more effectively.</p>
+      </div>
 
       <figure id="fig1" aria-labelledby="fig1-cap">
         <img src="./figures/paper_fig1_model_vs_baseline.png"
